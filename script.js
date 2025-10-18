@@ -14,23 +14,20 @@ const noResultsEl = document.getElementById('no-results');
 const scrollLeftBtn = document.getElementById('scroll-left-btn');
 const scrollRightBtn = document.getElementById('scroll-right-btn');
 const requestAudioBtn = document.getElementById('request-audio-btn');
-
-// TTS Modal elements
 const generateTtsBtn = document.getElementById('generate-tts-btn');
 const ttsModal = document.getElementById('tts-modal');
-const ttsCloseBtn = document.getElementById('tts-close-btn');
+const closeTtsModalBtn = document.getElementById('close-tts-modal');
 const ttsTextInput = document.getElementById('tts-text');
 const ttsVoiceSelect = document.getElementById('tts-voice');
-const ttsGenerateBtn = document.getElementById('tts-generate-btn');
-const ttsCharCount = document.getElementById('tts-char-count');
+const ttsSubmitBtn = document.getElementById('generate-tts-submit');
 
 // State
+let combinedAudioLibrary = [...audioLibrary];
 let activeTags = new Set();
 let showingFavorites = false;
-let showingTTS = false;
+let showingTTSOnly = false;
 let isDragging = false;
 let startX, scrollLeft;
-let ttsAudio = [];
 
 // Module instances
 const audioPlayer = new AudioPlayer();
@@ -40,19 +37,14 @@ const uiRenderer = new UIRenderer(gallery, tagFiltersContainer, audioPlayer, fav
 // Filter and render
 function filterAndRender() {
     const searchTerm = searchInput.value.toLowerCase().trim();
-    
-    let baseLibrary = [...audioLibrary, ...ttsAudio];
-    let filtered = baseLibrary;
+    let filtered = combinedAudioLibrary;
 
-    // Filter by TTS
-    if (showingTTS) {
-        filtered = ttsAudio;
-    }
-
-    // Filter by favorites
+    // Filter by favorites or TTS
     if (showingFavorites) {
         const userFavs = favoritesManager.getUserFavorites();
         filtered = filtered.filter(audio => userFavs[audio.id]);
+    } else if (showingTTSOnly) {
+        filtered = filtered.filter(audio => audio.tags.includes('tts'));
     }
 
     // Filter by search and tags
@@ -89,7 +81,7 @@ function updateScrollButtons() {
 function renderTags() {
     const handleTagClick = (tag, button) => {
         showingFavorites = false;
-        showingTTS = false;
+        showingTTSOnly = false;
         const wasActive = button.classList.contains('active');
         
         // Clear all active states
@@ -112,7 +104,7 @@ function renderTags() {
 
     const handleAllClick = () => {
         showingFavorites = false;
-        showingTTS = false;
+        showingTTSOnly = false;
         activeTags.clear();
         document.querySelectorAll('.tag-filters button').forEach(btn => 
             btn.classList.remove('active')
@@ -124,33 +116,34 @@ function renderTags() {
     const handleFavoritesClick = () => {
         activeTags.clear();
         showingFavorites = true;
-        showingTTS = false;
+        showingTTSOnly = false;
         document.querySelectorAll('.tag-filters button').forEach(btn => 
             btn.classList.remove('active')
         );
         document.querySelectorAll('.tag-filters button')[1].classList.add('active');
         filterAndRender();
     };
-
+    
     const handleTTSClick = () => {
         activeTags.clear();
         showingFavorites = false;
-        showingTTS = true;
-        document.querySelectorAll('.tag-filters button').forEach(btn => 
+        showingTTSOnly = true;
+        document.querySelectorAll('.tag-filters button').forEach(btn =>
             btn.classList.remove('active')
         );
-        const ttsButton = Array.from(document.querySelectorAll('.tag-filters button')).find(b => b.textContent === 'TTS');
-        if (ttsButton) ttsButton.classList.add('active');
+        document.querySelector('.tag-filters button[data-filter="tts"]').classList.add('active');
         filterAndRender();
     };
-    
+
     uiRenderer.renderTagFilters(
         activeTags,
         handleTagClick,
         handleAllClick,
         handleFavoritesClick,
         handleTTSClick,
-        getRecentTags()
+        getRecentTags(),
+        showingFavorites,
+        showingTTSOnly
     );
     
     updateScrollButtons();
@@ -183,48 +176,91 @@ tagFiltersContainer.addEventListener('mousemove', e => {
 });
 
 // TTS Modal Logic
-function openTtsModal() { ttsModal.classList.remove('hidden'); }
-function closeTtsModal() { ttsModal.classList.add('hidden'); }
+const voices = [
+    { value: "en-male", text: "English - Male" },
+    { value: "en-female", text: "English - Female" },
+    { value: "es-male", text: "Spanish - Male" },
+    { value: "es-female", text: "Spanish - Female" },
+    { value: "fr-male", text: "French - Male" },
+    { value: "fr-female", text: "French - Female" },
+    { value: "de-male", text: "German - Male" },
+    { value: "de-female", text: "German - Female" },
+    { value: "it-male", text: "Italian - Male" },
+    { value: "it-female", text: "Italian - Female" },
+    { value: "pt-male", text: "Portuguese - Male" },
+    { value: "pt-female", text: "Portuguese - Female" },
+    { value: "ru-male", text: "Russian - Male" },
+    { value: "ru-female", text: "Russian - Female" },
+];
 
-generateTtsBtn.onclick = openTtsModal;
-ttsCloseBtn.onclick = closeTtsModal;
-ttsModal.onclick = (e) => { if (e.target === ttsModal) closeTtsModal(); };
+function populateVoices() {
+    ttsVoiceSelect.innerHTML = '';
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.value;
+        option.textContent = voice.text;
+        ttsVoiceSelect.appendChild(option);
+    });
+}
 
-ttsTextInput.addEventListener('input', () => {
-    const len = ttsTextInput.value.length;
-    ttsCharCount.textContent = `${len} / 250`;
-    ttsGenerateBtn.disabled = len === 0 || len > 250;
-});
+function setTtsButtonLoading(isLoading) {
+    const btnText = ttsSubmitBtn.querySelector('.btn-text');
+    const loader = ttsSubmitBtn.querySelector('.loader');
+    ttsSubmitBtn.disabled = isLoading;
+    if (isLoading) {
+        btnText.classList.add('hidden');
+        loader.classList.remove('hidden');
+    } else {
+        btnText.classList.remove('hidden');
+        loader.classList.add('hidden');
+    }
+}
 
-ttsGenerateBtn.onclick = async () => {
+async function handleTtsSubmit() {
     const text = ttsTextInput.value.trim();
-    const voice = ttsVoiceSelect.value;
-    if (!text || text.length > 250) return;
-
-    ttsGenerateBtn.disabled = true;
-    ttsGenerateBtn.querySelector('span').textContent = 'Generating...';
-    ttsGenerateBtn.querySelector('.spinner').classList.remove('hidden');
-
+    if (!text) {
+        alert("Please enter some text.");
+        return;
+    }
+    setTtsButtonLoading(true);
     try {
-        await room.collection('tts_audio_v1').create({
+        const result = await websim.textToSpeech({
             text,
-            voice,
-            // The audioUrl will be populated by a backend process after generation.
-            // For now, we rely on a placeholder that resolves.
-            audioUrl: `https://texttospeech.googleapis.com/v1/text:synthesize?alt=media&key=placeholder&voice[languageCode]=en-US&voice[name]=en-US-Wavenet-D&audioConfig[audioEncoding]=MP3&input[text]=${encodeURIComponent(text)}`
+            voice: ttsVoiceSelect.value,
         });
+
+        const name = `TTS: ${text.substring(0, 20)}${text.length > 20 ? '...' : ''}`;
+
+        await room.collection('tts_assets_v1').create({
+            name,
+            src: result.url,
+            text,
+            voice: ttsVoiceSelect.value,
+            tags: ['tts', 'user-generated']
+        });
+        
         ttsTextInput.value = '';
-        ttsCharCount.textContent = '0 / 250';
-        closeTtsModal();
-    } catch (e) {
-        console.error("Failed to create TTS request:", e);
-        alert("Sorry, something went wrong. Please try again.");
+        ttsModal.classList.add('hidden');
+
+    } catch (error) {
+        console.error("Failed to generate TTS:", error);
+        alert("Sorry, there was an error generating the audio.");
     } finally {
-        ttsGenerateBtn.disabled = false;
-        ttsGenerateBtn.querySelector('span').textContent = 'Generate Audio';
-        ttsGenerateBtn.querySelector('.spinner').classList.add('hidden');
+        setTtsButtonLoading(false);
+    }
+}
+
+generateTtsBtn.onclick = () => {
+    populateVoices();
+    ttsModal.classList.remove('hidden');
+};
+closeTtsModalBtn.onclick = () => ttsModal.classList.add('hidden');
+ttsModal.onclick = (e) => {
+    if (e.target === ttsModal) {
+        ttsModal.classList.add('hidden');
     }
 };
+ttsSubmitBtn.onclick = handleTtsSubmit;
 
 // Event listeners
 searchInput.addEventListener('input', filterAndRender);
@@ -243,18 +279,22 @@ window.addEventListener('resize', updateScrollButtons);
 // Initialize app
 async function initApp() {
     await favoritesManager.init();
-    
-    room.collection('tts_audio_v1').subscribe(records => {
-        ttsAudio = records.map(r => ({
-            id: `tts-${r.id}`,
-            name: `TTS by ${r.username}`,
-            src: r.audioUrl,
-            tags: ['tts', 'generated', r.voice],
-            text: r.text
-        })).reverse();
-        filterAndRender();
-    });
 
+    room.collection('tts_assets_v1').subscribe(ttsRecords => {
+        const mappedTtsRecords = ttsRecords.map(record => ({
+            ...record,
+            id: record.id // ensure id is consistent for favorites
+        })).reverse(); // newest first
+        
+        combinedAudioLibrary = [...audioLibrary, ...mappedTtsRecords];
+        
+        // Re-render if something might have changed
+        if (document.querySelector('.audio-card')) {
+             filterAndRender();
+        }
+        renderTags();
+    });
+    
     // Re-render when favorites update
     favoritesManager.onUpdate(() => {
         if (document.querySelector('.audio-card')) {

@@ -154,6 +154,24 @@ export class UIRenderer {
             
             this.gallery.appendChild(card);
         });
+
+        this.adjustFontSizes();
+    }
+
+    adjustFontSizes() {
+        const audioNames = this.gallery.querySelectorAll('.audio-name');
+        audioNames.forEach(nameEl => {
+            let currentFontSize = parseFloat(window.getComputedStyle(nameEl).fontSize);
+            let attempts = 0;
+            const maxAttempts = 5;
+
+            // Reduce font size if text overflows vertically
+            while (nameEl.scrollHeight > nameEl.clientHeight && attempts < maxAttempts) {
+                currentFontSize -= 1;
+                nameEl.style.fontSize = `${currentFontSize}px`;
+                attempts++;
+            }
+        });
     }
 
     renderTagFilters(activeTags, onTagClick, onAllClick, onFavoritesClick, onTopClick, onTTSClick, onImageClick, recentTags = [], showingFavorites, showingTopOnly, showingTTSOnly, showingImageOnly) {

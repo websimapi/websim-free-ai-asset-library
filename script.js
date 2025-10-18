@@ -75,7 +75,11 @@ const d=[
     {id:74,name:'Electronic Lock',src:'electronic_lock.mp3',tags:['electronic', 'mechanism', 'sci-fi', 'fx']},
     {id:75,name:'Low Health Warning',src:'low_health_warning.mp3',tags:['health','negative','status','loop','ui']},
     {id:76,name:'Max Health Boost',src:'max_health_boost.mp3',tags:['health','positive','fx','reward']},
-    {id:77,name:'Health Drain Sizzle',src:'health_drain_sizzle.mp3',tags:['health','negative','status','fx']}
+    {id:77,name:'Health Drain Sizzle',src:'health_drain_sizzle.mp3',tags:['health','negative','status','fx']},
+    {id:78,name:'Steam Release',src:'steam_release.mp3',tags:['industrial','environment','fx','short']},
+    {id:79,name:'Metal Press',src:'metal_press.mp3',tags:['industrial','mechanism','heavy','impact']},
+    {id:80,name:'Hydraulic Pump Loop',src:'hydraulic_pump.mp3',tags:['industrial','mechanism','loop','ambience']},
+    {id:81,name:'Wrench Drop',src:'wrench_drop.mp3',tags:['industrial','interaction','fx','short']}
 ];
 
 const g=document.getElementById('gallery'),

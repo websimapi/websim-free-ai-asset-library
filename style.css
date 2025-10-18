@@ -95,6 +95,10 @@ header p {
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
+.tag-filters-wrapper {
+    position: relative;
+}
+
 .tag-filters {
     display: flex;
     flex-wrap: nowrap;
@@ -130,6 +134,66 @@ header p {
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
+}
+
+.scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(calc(-50% - 4px)); /* Adjust for padding-bottom on filters */
+    z-index: 10;
+    background-color: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: none; /* Hidden by default, shown via media query */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, opacity 0.3s ease, transform 0.1s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.scroll-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scroll-btn:hover {
+    background-color: var(--surface-color);
+}
+
+.scroll-btn:active {
+    transform: translateY(calc(-50% - 4px)) scale(0.95);
+}
+
+#scroll-left-btn {
+    left: -18px;
+}
+
+#scroll-right-btn {
+    right: -18px;
+}
+
+#scroll-left-btn svg, #scroll-right-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Show scroll buttons on desktop where hover is possible and screen is wider */
+@media (hover: hover) and (min-width: 769px) {
+    .scroll-btn {
+        display: inline-flex;
+    }
+
+    .tag-filters-wrapper {
+        -webkit-mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent);
+        mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent);
+    }
 }
 
 .gallery {

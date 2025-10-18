@@ -20,6 +20,8 @@ const searchInput = document.getElementById('search-input');
 const tagFiltersContainer = document.getElementById('tag-filters');
 const requestAudioBtn = document.getElementById('request-audio-btn');
 const noResultsEl = document.getElementById('no-results');
+const scrollLeftBtn = document.getElementById('scroll-left-btn');
+const scrollRightBtn = document.getElementById('scroll-right-btn');
 
 let audioContext;
 const audioBuffers = new Map();
@@ -192,6 +194,9 @@ function renderTags() {
         });
         tagFiltersContainer.appendChild(button);
     });
+
+    // After rendering, check if scroll buttons are needed
+    updateScrollButtons();
 }
 
 
@@ -211,6 +216,35 @@ function filterAndRender() {
     renderGallery(filteredData);
 }
 
+// --- Scroll Button Logic for Tag Filters ---
+function updateScrollButtons() {
+    if (!scrollLeftBtn || !scrollRightBtn || !tagFiltersContainer) return;
+
+    const { scrollWidth, clientWidth, scrollLeft } = tagFiltersContainer;
+    const isScrollable = scrollWidth > clientWidth;
+    
+    if (!isScrollable) {
+        scrollLeftBtn.classList.remove('visible');
+        scrollRightBtn.classList.remove('visible');
+        return;
+    }
+
+    // Check left button
+    if (scrollLeft > 0) {
+        scrollLeftBtn.classList.add('visible');
+    } else {
+        scrollLeftBtn.classList.remove('visible');
+    }
+
+    // Check right button
+    if (scrollLeft < scrollWidth - clientWidth - 1) { // -1 for subpixel rendering issues
+        scrollRightBtn.classList.add('visible');
+    } else {
+        scrollRightBtn.classList.remove('visible');
+    }
+}
+
+
 // Event Listeners
 searchInput.addEventListener('input', filterAndRender);
 requestAudioBtn.addEventListener('click', () => {
@@ -219,6 +253,22 @@ requestAudioBtn.addEventListener('click', () => {
         content: '\n'
     });
 });
+
+scrollLeftBtn.addEventListener('click', () => {
+    const scrollAmount = tagFiltersContainer.clientWidth * 0.8;
+    tagFiltersContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+});
+
+scrollRightBtn.addEventListener('click', () => {
+    const scrollAmount = tagFiltersContainer.clientWidth * 0.8;
+    tagFiltersContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+});
+
+// Update scroll buttons on scroll
+tagFiltersContainer.addEventListener('scroll', updateScrollButtons, { passive: true });
+
+// Update on resize
+window.addEventListener('resize', updateScrollButtons);
 
 
 // Initial Load

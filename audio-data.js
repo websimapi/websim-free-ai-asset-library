@@ -104,5 +104,10 @@ export const audioLibrary = [
     {id:103,name:'Winter Ambience',src:'winter_ambience.mp3',tags:['nature','ambience','loop','cold','environment']},
     {id:104,name:'Urgent Beep Alert',src:'urgent_beep_alert.mp3',tags:['ui','notification','alert','electronic','urgent','short']},
     {id:105,name:'Low Priority Warning',src:'low_priority_warning.mp3',tags:['ui','notification','alert','electronic','warning','short']},
-    {id:106,name:'Emergency Horn',src:'emergency_horn.mp3',tags:['alert','environment','heavy','impact']}
+    {id:106,name:'Emergency Horn',src:'emergency_horn.mp3',tags:['alert','environment','heavy','impact']},
+    {id:107,name:'Tension Pulse',src:'tension_pulse.mp3',tags:['electronic','sci-fi','tension','loop','fx']},
+    {id:108,name:'Ticking Timer',src:'ticking_timer.mp3',tags:['time','mechanism','tension','short','fx']},
+    {id:109,name:'Rising Drone Swell',src:'rising_drone_swell.mp3',tags:['ambience','spooky','tension','fx']},
+    {id:110,name:'Muffled Screams',src:'muffled_screams.mp3',tags:['spooky','creature','tension','ambient']},
+    {id:111,name:'Metallic Scrape Acceleration',src:'metallic_scrape_acceleration.mp3',tags:['industrial','mechanism','tension','fx']}
 ];

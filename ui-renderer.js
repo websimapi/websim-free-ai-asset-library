@@ -16,11 +16,37 @@ export class UIRenderer {
             card.className = 'audio-card';
             
             // Download button
-            const downloadLink = document.createElement('a');
-            downloadLink.href = audio.src;
-            downloadLink.download = audio.name.replace(/ /g, '_') + '.mp3';
-            downloadLink.className = 'download-button';
-            downloadLink.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+            const downloadButton = document.createElement('button');
+            downloadButton.className = 'download-button';
+            downloadButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+
+            downloadButton.onclick = async (e) => {
+                e.preventDefault();
+                if (downloadButton.disabled) return;
+                downloadButton.disabled = true;
+                downloadButton.style.opacity = '0.5';
+
+                try {
+                    const response = await fetch(audio.src);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = audio.name.replace(/ /g, '_') + '.mp3';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                } catch (err) {
+                    console.error('Download failed:', err);
+                    alert('Could not download the file.');
+                } finally {
+                    downloadButton.disabled = false;
+                    downloadButton.style.opacity = '1';
+                }
+            };
             
             // Favorite section
             const favSection = document.createElement('div');
@@ -64,7 +90,7 @@ export class UIRenderer {
             audioName.className = 'audio-name';
             audioName.textContent = audio.name;
 
-            card.append(downloadLink, favSection, playButton, audioName);
+            card.append(downloadButton, favSection, playButton, audioName);
             this.gallery.appendChild(card);
         });
     }

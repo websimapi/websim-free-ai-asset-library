@@ -98,5 +98,8 @@ export const audioLibrary = [
     {id:97,name:'Potion Consume',src:'potion_consume.mp3',tags:['game','inventory','health','fx']},
     {id:98,name:'System Notification',src:'system_notification.mp3',tags:['ui', 'notification', 'electronic', 'short']},
     {id:99,name:'Critical Alert',src:'critical_alert.mp3',tags:['ui', 'notification', 'negative', 'alert']},
-    {id:100,name:'Success Chime',src:'success_chime.mp3',tags:['ui', 'notification', 'positive', 'reward', 'short']}
+    {id:100,name:'Success Chime',src:'success_chime.mp3',tags:['ui', 'notification', 'positive', 'reward', 'short']},
+    {id:101,name:'Ice Crackle',src:'ice_crackle.mp3',tags:['nature','environment','fx','short','cold']},
+    {id:102,name:'Frozen Footsteps',src:'frozen_footsteps.mp3',tags:['character','movement','loop','cold','environment']},
+    {id:103,name:'Winter Ambience',src:'winter_ambience.mp3',tags:['nature','ambience','loop','cold','environment']}
 ];

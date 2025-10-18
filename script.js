@@ -14,26 +14,49 @@ let currentlyPlaying = null;
 const RECENT_TAGS_STORAGE_KEY = 'audioFilterUsage';
 
 // --- Audio Data Generation ---
-function buildAudioDataFromAssets() {
-    const assetPaths = [
-      './alert_notification__ui_notification_short.mp3',
-      './footsteps_grass__character_movement_loop.mp3',
-      './hit_damage__game_negative_fx_impact.mp3',
-      './power_up__game_positive_fx_collect.mp3',
-      './laser_shot__sci-fi_weapon_short_fx.mp3',
-      './jump__game_character_movement_short.mp3',
-      './explosion__game_weapon_fx_impact.mp3',
-      './ui_error__ui_negative_short.mp3',
-      './magic_spell__magic_fx_positive_game.mp3',
-      './ui_confirm__ui_positive_short.mp3',
-      './ambient_forest__ambience_nature_loop.mp3',
-      './sword_swing__weapon_character_short_fx.mp3',
-      './coin_pickup__game_positive_ui_collect.mp3',
-      './menu_select__ui_short_game.mp3'
+async function buildAudioDataFromAssets() {
+    // Dynamically discover MP3 files by attempting to load them
+    // Since we're in a browser environment, we'll try fetching known patterns
+    const response = await fetch('./');
+    const text = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+    
+    // Extract MP3 file references from the page or try common names
+    // For now, we'll use a fetch-based discovery approach
+    const possibleFiles = [
+        'alert_notification__ui_notification_short.mp3',
+        'ambient_forest__ambience_nature_loop.mp3',
+        'coin_pickup__game_positive_ui_collect.mp3',
+        'explosion__game_weapon_fx_impact.mp3',
+        'footsteps_grass__character_movement_loop.mp3',
+        'hit_damage__game_negative_fx_impact.mp3',
+        'jump__game_character_movement_short.mp3',
+        'laser_shot__sci-fi_weapon_short_fx.mp3',
+        'magic_spell__magic_fx_positive_game.mp3',
+        'menu_select__ui_short_game.mp3',
+        'power_up__game_positive_fx_collect.mp3',
+        'sword_swing__weapon_character_short_fx.mp3',
+        'ui_confirm__ui_positive_short.mp3',
+        'ui_error__ui_negative_short.mp3'
     ];
 
-    audioData = assetPaths.map((path, index) => {
-        const fileName = path.split('/').pop(); // Get filename from path
+    // Verify which files actually exist
+    const existingFiles = [];
+    await Promise.all(
+        possibleFiles.map(async (file) => {
+            try {
+                const res = await fetch(`./${file}`, { method: 'HEAD' });
+                if (res.ok) {
+                    existingFiles.push(file);
+                }
+            } catch (e) {
+                // File doesn't exist, skip it
+            }
+        })
+    );
+
+    audioData = existingFiles.map((fileName, index) => {
         const [namePart, tagsPart] = fileName.replace('.mp3', '').split('__');
         const name = namePart.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         const tags = tagsPart ? tagsPart.split('_') : [];
@@ -41,7 +64,7 @@ function buildAudioDataFromAssets() {
         return {
             id: index + 1,
             name: name,
-            src: path,
+            src: `./${fileName}`,
             tags: tags
         };
     });
@@ -321,8 +344,8 @@ window.addEventListener('resize', updateScrollButtons);
 
 
 // Initial Load
-document.addEventListener('DOMContentLoaded', () => {
-    buildAudioDataFromAssets();
+document.addEventListener('DOMContentLoaded', async () => {
+    await buildAudioDataFromAssets();
     renderTags();
     renderGallery(audioData);
 });

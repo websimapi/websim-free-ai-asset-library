@@ -50,7 +50,11 @@ function filterAndRender() {
     filtered = filtered.filter(audio => {
         const nameMatch = audio.name.toLowerCase().includes(searchTerm);
         const tagMatch = audio.tags.some(t => t.toLowerCase().includes(searchTerm));
-        const searchMatch = searchTerm === '' || nameMatch || tagMatch;
+        
+        // Check if audio has a 'text' property (TTS items) for full text search
+        const ttsTextMatch = audio.text ? audio.text.toLowerCase().includes(searchTerm) : false;
+
+        const searchMatch = searchTerm === '' || nameMatch || tagMatch || ttsTextMatch;
         const tagFilterMatch = !activeTags.size || [...activeTags].every(t => audio.tags.includes(t));
         return searchMatch && tagFilterMatch;
     });

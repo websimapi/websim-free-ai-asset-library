@@ -65,7 +65,10 @@ const d=[
     {id:64,name:'Heavy Armor Hit',src:'heavy_armor_hit.mp3',tags:['defense', 'impact', 'armor', 'fx']},
     {id:65,name:'Chain Armor Jingle',src:'chain_armor_jingle.mp3',tags:['armor', 'movement', 'fx', 'loop']},
     {id:66,name:'Plate Armor Walk',src:'plate_armor_clank.mp3',tags:['armor', 'movement', 'heavy', 'fx']},
-    {id:67,name:'Armor Shatter',src:'armor_shatter.mp3',tags:['armor', 'negative', 'impact', 'fx']}
+    {id:67,name:'Armor Shatter',src:'armor_shatter.mp3',tags:['armor', 'negative', 'impact', 'fx']},
+    {id:68,name:'Dagger Stab',src:'dagger_stab.mp3',tags:['weapon', 'impact', 'damage', 'short', 'fx']},
+    {id:69,name:'Acid Burn',src:'acid_burn.mp3',tags:['magic', 'damage', 'status', 'negative', 'fx']},
+    {id:70,name:'Crushing Blow',src:'crushing_blow.mp3',tags:['weapon', 'impact', 'damage', 'heavy', 'fx']}
 ];
 
 const g=document.getElementById('gallery'),

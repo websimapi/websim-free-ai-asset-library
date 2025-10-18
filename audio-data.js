@@ -101,5 +101,8 @@ export const audioLibrary = [
     {id:100,name:'Success Chime',src:'success_chime.mp3',tags:['ui', 'notification', 'positive', 'reward', 'short']},
     {id:101,name:'Ice Crackle',src:'ice_crackle.mp3',tags:['nature','environment','fx','short','cold']},
     {id:102,name:'Frozen Footsteps',src:'frozen_footsteps.mp3',tags:['character','movement','loop','cold','environment']},
-    {id:103,name:'Winter Ambience',src:'winter_ambience.mp3',tags:['nature','ambience','loop','cold','environment']}
+    {id:103,name:'Winter Ambience',src:'winter_ambience.mp3',tags:['nature','ambience','loop','cold','environment']},
+    {id:104,name:'Urgent Beep Alert',src:'urgent_beep_alert.mp3',tags:['ui','notification','alert','electronic','urgent','short']},
+    {id:105,name:'Low Priority Warning',src:'low_priority_warning.mp3',tags:['ui','notification','alert','electronic','warning','short']},
+    {id:106,name:'Emergency Horn',src:'emergency_horn.mp3',tags:['alert','environment','heavy','impact']}
 ];

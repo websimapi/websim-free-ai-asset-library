@@ -72,7 +72,10 @@ const d=[
     {id:71,name:'System Boot',src:'system_boot.mp3',tags:['electronic', 'sci-fi', 'positive', 'fx']},
     {id:72,name:'Holographic UI Tap',src:'holographic_ui_tap.mp3',tags:['electronic', 'ui', 'sci-fi', 'short']},
     {id:73,name:'Data Transfer Loop',src:'data_transfer_loop.mp3',tags:['electronic', 'sci-fi', 'loop', 'ambience']},
-    {id:74,name:'Electronic Lock',src:'electronic_lock.mp3',tags:['electronic', 'mechanism', 'sci-fi', 'fx']}
+    {id:74,name:'Electronic Lock',src:'electronic_lock.mp3',tags:['electronic', 'mechanism', 'sci-fi', 'fx']},
+    {id:75,name:'Low Health Warning',src:'low_health_warning.mp3',tags:['health','negative','status','loop','ui']},
+    {id:76,name:'Max Health Boost',src:'max_health_boost.mp3',tags:['health','positive','fx','reward']},
+    {id:77,name:'Health Drain Sizzle',src:'health_drain_sizzle.mp3',tags:['health','negative','status','fx']}
 ];
 
 const g=document.getElementById('gallery'),

@@ -29,78 +29,29 @@ header p{color:var(--text-muted-color);font-size:.9rem;max-width:400px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem}
 .audio-card{background-color:var(--surface-color);border-radius:8px;padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.75rem;border:1px solid transparent;transition:border-color .2s ease;position:relative}
 .audio-card:hover{border-color:var(--border-color)}
+.favorite-section{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;align-items:center;z-index:5}
+.favorite-button{background:none;border:none;color:var(--text-muted-color);cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:color .2s ease,transform .2s ease}
+.favorite-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+.favorite-button:hover{color:var(--primary-color)}
+.favorite-button.active{color:#ffc107}
+.favorite-button.active svg{fill:#ffc107;stroke:#ffc107}
+.favorite-button:active{transform:scale(.9)}
+.favorite-count{font-size:.75rem;color:var(--text-muted-color);margin-top:-4px}
 .download-button{position:absolute;top:10px;left:10px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--text-color);background-color:rgba(0,0,0,.4);border-radius:50%;transition:background-color .2s ease;text-decoration:none;z-index:5}
 .download-button:hover{background-color:var(--primary-color)}
 .download-button svg{width:16px;height:16px}
-
-/* New favorite styles */
-.favorite-group {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-
-.favorite-button {
-    width: 30px;
-    height: 30px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    color: var(--text-muted-color);
-    transition: color 0.2s ease, transform 0.1s ease;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.favorite-button svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-}
-
-.favorite-button:hover {
-    color: var(--primary-color);
-    transform: scale(1.1);
-}
-
-.favorite-button.favorited {
-    color: #ff456e;
-}
-
-.favorite-count {
-    font-size: 0.7rem;
-    color: var(--text-muted-color);
-    font-weight: 600;
-}
-/* End new favorite styles */
-
-.play-button{width:44px;height:44px}.play-button svg{width:20px;height:20px}.audio-name{font-size:.8rem}}
-
-
+.play-button{width:50px;height:50px;border-radius:50%;background-color:var(--primary-color);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .2s ease;flex-shrink:0}
+.play-button:hover{background-color:var(--primary-hover-color)}
+.play-button svg{fill:white;width:24px;height:24px;transition:transform .1s ease}
+.play-button.playing svg{transform:scale(.9)}
+.audio-name{font-size:.9rem;font-weight:400;color:var(--text-color)}
+#no-results{text-align:center;color:var(--text-muted-color);padding:2rem}
+.hidden{display:none}
 @media(max-width:640px){#app-container{padding:.75rem}header{flex-direction:column;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}header h1{font-size:1.5rem}header p{font-size:.875rem;max-width:100%}#request-audio-btn{width:100%;padding:.85rem}.controls{margin-bottom:1.5rem}#search-input{font-size:.95rem}.tag-filters{gap:.4rem}.tag-filters button{padding:.4rem .8rem;font-size:.85rem}.gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}.audio-card{padding:.75rem;gap:.5rem;position:relative}
 .download-button{top:8px;left:8px;width:26px;height:26px}
 .download-button svg{width:14px;height:14px}
-/* Mobile adjustments for favorites */
-.favorite-group {
-    top: 8px;
-    right: 8px;
-}
-.favorite-button {
-    width: 26px;
-    height: 26px;
-}
-.favorite-button svg {
-    width: 16px;
-    height: 16px;
-}
-.favorite-count {
-    font-size: 0.65rem;
-}
-/* End Mobile adjustments for favorites */
+.favorite-section{top:8px;right:8px}
+.favorite-button{width:26px;height:26px}
+.favorite-button svg{width:16px;height:16px}
+.favorite-count{font-size:.7rem}
+.play-button{width:44px;height:44px}.play-button svg{width:20px;height:20px}.audio-name{font-size:.8rem}}

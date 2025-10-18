@@ -86,7 +86,10 @@ const d=[
     {id:85,name:'Gentle Rain Patter',src:'gentle_rain_patter.mp3',tags:['nature','ambience','loop','weather']},
     {id:86,name:'Heavy Downpour',src:'heavy_downpour.mp3',tags:['nature','ambience','loop','weather','environment']},
     {id:87,name:'Blizzard Wind',src:'blizzard_wind.mp3',tags:['nature','environment','loop','weather','cold']},
-    {id:88,name:'Distant Thunderstorm',src:'distant_thunderstorm.mp3',tags:['nature','ambience','loop','weather','environment']}
+    {id:88,name:'Distant Thunderstorm',src:'distant_thunderstorm.mp3',tags:['nature','ambience','loop','weather','environment']},
+    {id:89,name:'Creepy Laughter',src:'creepy_laughter.mp3',tags:['spooky','creature','short','fx']},
+    {id:90,name:'Chains Rattling',src:'chains_rattling.mp3',tags:['spooky','interaction','environment','fx']},
+    {id:91,name:'Ominous Drone',src:'ominous_drone.mp3',tags:['spooky','ambience','loop','tension']}
 ];
 
 const room=new WebsimSocket;

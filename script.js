@@ -167,11 +167,7 @@ function filterAndRender() {
 searchInput.addEventListener('input', filterAndRender);
 requestAudioBtn.addEventListener('click', () => {
     // This function opens the native Websim comments UI
-    if (window.websim && window.websim.openComments) {
-        window.websim.openComments();
-    } else {
-        alert("To request audio, please leave a comment on this project!");
-    }
+    window.websim?.openComments?.();
 });
 
 
@@ -180,4 +176,3 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTags();
     renderGallery(audioData);
 });
-

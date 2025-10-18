@@ -104,7 +104,7 @@ ar=t=>{let r=gr().filter(x=>x!==t);r.unshift(t);sr(r)},
 ia=()=>{ac||(ac=new(window.AudioContext||window.webkitAudioContext)())},
 la=async u=>{if(ab.has(u))return ab.get(u);try{const r=await fetch(u),a=await r.arrayBuffer(),b=await ac.decodeAudioData(a);ab.set(u,b);return b}catch(e){console.error(`Error loading ${u}:`,e)}},
 ps=(b,btn)=>{if(!ac)return;cp?.source?.stop();cp?.button?.classList.remove('playing');const s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);btn.classList.add('playing');s.onended=()=>{btn.classList.remove('playing');cp?.source===s&&(cp=null)};cp={source:s,button:btn}},
-handleFavoriteClick=async(audioId,button)=>{if(!currentUser||button.disabled)return;button.disabled=!0;button.style.opacity='0.5';const currentFavs=userFavoritesRecord?.favorites||[],isFavorited=currentFavs.includes(audioId),newFavs=isFavorited?currentFavs.filter(id=>id!==audioId):[...currentFavs,audioId];try{if(userFavoritesRecord){await room.collection('user_favorites_v1').update(userFavoritesRecord.id,{favorites:newFavs})}else{await room.collection('user_favorites_v1').create({favorites:newFavs})}}catch(e){console.error('Failed to update favorites:',e)}finally{button.disabled=!1;button.style.opacity='1'}},
+handleFavoriteClick=async(audioId,button)=>{if(!currentUser||button.disabled)return;button.disabled=!0;button.style.opacity='0.5';const currentFavs=userFavoritesRecord?.favorites||[];const isFavorited=currentFavs.includes(audioId);const newFavs=isFavorited?currentFavs.filter(id=>id!==audioId):[...currentFavs,audioId];try{if(userFavoritesRecord){if(JSON.stringify(userFavoritesRecord.favorites)!==JSON.stringify(newFavs)){await room.collection('user_favorites_v1').update(userFavoritesRecord.id,{favorites:newFavs})}}else{const newRecord=await room.collection('user_favorites_v1').create({favorites:newFavs});userFavoritesRecord=newRecord}}catch(e){console.error('Failed to update favorites:',e)}finally{button.disabled=!1;button.style.opacity='1'}},
 rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(x=>{
     const c=document.createElement('div');
     c.className='audio-card';
@@ -168,9 +168,25 @@ const initApp = async () => {
     currentUser = await window.websim.getCurrentUser();
     room.collection('user_favorites_v1').subscribe(records => {
         processFavoritesData(records);
-        fr();
+        // Re-render only if the gallery has been rendered at least once
+        if (document.querySelector('.audio-card')) {
+            fr();
+        }
     });
+
+    // Initial data load and render
+    const initialRecords = await new Promise(resolve => {
+        const unsubscribe = room.collection('user_favorites_v1').subscribe(records => {
+            if (records) {
+                resolve(records);
+                unsubscribe();
+            }
+        });
+    });
+
+    processFavoritesData(initialRecords);
     rt();
+    fr();
 };
 
 document.addEventListener('DOMContentLoaded', initApp);

@@ -96,7 +96,7 @@ nr=document.getElementById('no-results'),
 lb=document.getElementById('scroll-left-btn'),
 rb2=document.getElementById('scroll-right-btn');
 
-let ac,ab=new Map(),at=new Set(),cp=null,k='audioFilterUsage',iD=!1,sX,sL,currentUser,userFavoritesRecord=null,favoriteCounts={},showingFavorites=!1;
+let ac,ab=new Map(),at=new Set(),cp=null,k='audioFilterUsage',iD=!1,sX,sL,currentUser,userFavoritesRecord=null,favoriteCounts={},showingFavorites=!1, allFavorites = [];
 
 const gr=()=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}},
 sr=t=>{try{localStorage.setItem(k,JSON.stringify(t))}catch(e){}},

@@ -7,7 +7,7 @@ const d=[
     {id:6,name:'Hit Damage',src:'hit_damage.mp3',tags:['game','negative','fx','impact']},
     {id:7,name:'Menu Select',src:'menu_select.mp3',tags:['ui','short','game']},
     {id:8,name:'Footsteps',src:'footsteps_grass.mp3',tags:['character','movement','loop']},
-    {id:9,name:'Sword Swing',src:'sword_swing.mp3',tags:['weapon','character','short','fx']},
+    {id:9,name:'Anvil',src:'sword_swing.mp3',tags:['weapon','character','short','fx']},
     {id:10,name:'Magic Spell',src:'magic_spell.mp3',tags:['magic','fx','positive','game']},
     {id:11,name:'Alert Notification',src:'alert_notification.mp3',tags:['ui','notification','short']},
     {id:12,name:'Ambient Forest',src:'ambient_forest.mp3',tags:['ambience','nature','loop']},

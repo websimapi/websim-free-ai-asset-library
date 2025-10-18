@@ -104,7 +104,7 @@ ar=t=>{let r=gr().filter(x=>x!==t);r.unshift(t);sr(r)},
 ia=()=>{ac||(ac=new(window.AudioContext||window.webkitAudioContext)())},
 la=async u=>{if(ab.has(u))return ab.get(u);try{const r=await fetch(u),a=await r.arrayBuffer(),b=await ac.decodeAudioData(a);ab.set(u,b);return b}catch(e){console.error(`Error loading ${u}:`,e)}},
 ps=(b,btn)=>{if(!ac)return;cp?.source?.stop();cp?.button?.classList.remove('playing');const s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);btn.classList.add('playing');s.onended=()=>{btn.classList.remove('playing');cp?.source===s&&(cp=null)};cp={source:s,button:btn}},
-handleFavoriteClick=async(audioId,button)=>{if(!currentUser||button.disabled)return;button.disabled=!0;button.style.opacity='0.5';const currentFavs=userFavoritesRecord?.favorites||[];const isFavorited=currentFavs.includes(audioId);const newFavs=isFavorited?currentFavs.filter(id=>id!==audioId):[...currentFavs,audioId];try{if(userFavoritesRecord){if(JSON.stringify(userFavoritesRecord.favorites)!==JSON.stringify(newFavs)){await room.collection('user_favorites_v1').update(userFavoritesRecord.id,{favorites:newFavs})}}else{const newRecord=await room.collection('user_favorites_v1').create({favorites:newFavs});userFavoritesRecord=newRecord}}catch(e){console.error('Failed to update favorites:',e)}finally{button.disabled=!1;button.style.opacity='1'}},
+handleFavoriteClick=async(audioId,button)=>{if(!currentUser||button.disabled)return;button.disabled=!0;button.style.opacity='0.5';const currentFavs=userFavoritesRecord?.favorites||{};const newFavs={...currentFavs};if(newFavs[audioId]){delete newFavs[audioId]}else{newFavs[audioId]=!0}try{if(userFavoritesRecord){await room.collection('user_favorites_v2').update(userFavoritesRecord.id,{favorites:newFavs})}else{const newRecord=await room.collection('user_favorites_v2').create({favorites:newFavs});userFavoritesRecord=newRecord}}catch(e){console.error('Failed to update favorites:',e)}finally{button.disabled=!1;button.style.opacity='1'}},
 rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(x=>{
     const c=document.createElement('div');
     c.className='audio-card';
@@ -120,7 +120,7 @@ rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(
     favButton.className = 'favorite-button';
     favButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>`;
     favButton.onclick = () => handleFavoriteClick(x.id, favButton);
-    const isFavorited = userFavoritesRecord?.favorites?.includes(x.id);
+    const isFavorited = userFavoritesRecord?.favorites?.[x.id];
     if(isFavorited) favButton.classList.add('active');
 
     const favCount = document.createElement('div');
@@ -136,7 +136,7 @@ rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(
     c.append(dl,favSection,b,n);
     g.appendChild(c)})},
 rt=()=>{const a=[...new Set(d.flatMap(x=>x.tags))],r=gr();a.sort((x,y)=>{const ix=r.indexOf(x),iy=r.indexOf(y);return ix!==-1&&iy!==-1?ix-iy:ix!==-1?-1:iy!==-1?1:x.localeCompare(y)});tf.innerHTML='';const allBtn=document.createElement('button');allBtn.textContent='All';allBtn.classList.add('active');allBtn.onclick=()=>{showingFavorites=!1;at.clear();document.querySelectorAll('.tag-filters button').forEach(b=>b.classList.remove('active'));allBtn.classList.add('active');fr()};tf.appendChild(allBtn);const favBtn=document.createElement('button');favBtn.textContent='Favorites';favBtn.onclick=()=>{at.clear();showingFavorites=!0;document.querySelectorAll('.tag-filters button').forEach(b=>b.classList.remove('active'));favBtn.classList.add('active');fr()};tf.appendChild(favBtn);a.forEach(t=>{const b=document.createElement('button');b.textContent=t;b.dataset.tag=t;b.onclick=()=>{showingFavorites=!1;allBtn.classList.remove('active');favBtn.classList.remove('active');b.classList.toggle('active');at.has(t)?at.delete(t):(at.add(t),ar(t));if(!at.size&&!showingFavorites)allBtn.classList.add('active');fr()};tf.appendChild(b)});us()},
-fr=()=>{let s=si.value.toLowerCase().trim(),f=d;const userFavs=userFavoritesRecord?.favorites||[];if(showingFavorites){f=f.filter(x=>userFavs.includes(x.id))}f=f.filter(x=>{const nm=x.name.toLowerCase().includes(s),tm=x.tags.some(t=>t.toLowerCase().includes(s)),sm=s===''||nm||tm,am=!at.size||[...at].every(t=>x.tags.includes(t));return sm&&am});rg(f)},
+fr=()=>{let s=si.value.toLowerCase().trim(),f=d;const userFavs=userFavoritesRecord?.favorites||{};if(showingFavorites){f=f.filter(x=>userFavs[x.id])}f=f.filter(x=>{const nm=x.name.toLowerCase().includes(s),tm=x.tags.some(t=>t.toLowerCase().includes(s)),sm=s===''||nm||tm,am=!at.size||[...at].every(t=>x.tags.includes(t));return sm&&am});rg(f)},
 us=()=>{if(!lb||!rb2||!tf)return;const{scrollWidth:sw,clientWidth:cw,scrollLeft:sl}=tf,is=sw>cw;if(!is){lb.classList.remove('visible');rb2.classList.remove('visible');return}lb.classList[sl>0?'add':'remove']('visible');rb2.classList[sl<sw-cw-1?'add':'remove']('visible')};
 
 tf.addEventListener('mousedown',e=>{if(e.button!==0)return;iD=!0;tf.classList.add('grabbing');sX=e.pageX-tf.offsetLeft;sL=tf.scrollLeft});
@@ -157,7 +157,7 @@ const processFavoritesData = records => {
     }
     const counts = {};
     records.forEach(record => {
-        record.favorites?.forEach(audioId => {
+        Object.keys(record.favorites || {}).forEach(audioId => {
             counts[audioId] = (counts[audioId] || 0) + 1;
         });
     });
@@ -166,7 +166,7 @@ const processFavoritesData = records => {
 
 const initApp = async () => {
     currentUser = await window.websim.getCurrentUser();
-    room.collection('user_favorites_v1').subscribe(records => {
+    room.collection('user_favorites_v2').subscribe(records => {
         processFavoritesData(records);
         // Re-render only if the gallery has been rendered at least once
         if (document.querySelector('.audio-card')) {
@@ -176,7 +176,7 @@ const initApp = async () => {
 
     // Initial data load and render
     const initialRecords = await new Promise(resolve => {
-        const unsubscribe = room.collection('user_favorites_v1').subscribe(records => {
+        const unsubscribe = room.collection('user_favorites_v2').subscribe(records => {
             if (records) {
                 resolve(records);
                 unsubscribe();

@@ -11,7 +11,7 @@ export class FavoritesManager {
         this.currentUser = await window.websim.getCurrentUser();
         
         // Subscribe to favorites updates
-        this.room.collection('user_favorites_v2').subscribe(records => {
+        this.room.collection('user_data_v2').subscribe(records => {
             this.processFavoritesData(records);
             if (this.onUpdateCallback) {
                 this.onUpdateCallback();
@@ -20,7 +20,7 @@ export class FavoritesManager {
 
         // Wait for initial data load
         const initialRecords = await new Promise(resolve => {
-            const unsubscribe = this.room.collection('user_favorites_v2').subscribe(records => {
+            const unsubscribe = this.room.collection('user_data_v2').subscribe(records => {
                 if (records) {
                     resolve(records);
                     unsubscribe();
@@ -75,13 +75,14 @@ export class FavoritesManager {
 
         try {
             if (this.userFavoritesRecord) {
-                await this.room.collection('user_favorites_v2').update(
+                await this.room.collection('user_data_v2').update(
                     this.userFavoritesRecord.id,
                     { favorites: newFavs }
                 );
             } else {
-                const newRecord = await this.room.collection('user_favorites_v2').create({
-                    favorites: newFavs
+                const newRecord = await this.room.collection('user_data_v2').create({
+                    favorites: newFavs,
+                    tts_assets: {}
                 });
                 this.userFavoritesRecord = newRecord;
             }

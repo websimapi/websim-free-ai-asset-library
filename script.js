@@ -228,15 +228,31 @@ async function handleTtsSubmit() {
             voice: ttsVoiceSelect.value,
         });
 
-        const name = `TTS: ${text.substring(0, 20)}${text.length > 20 ? '...' : ''}`;
-
-        await room.collection('tts_assets_v1').create({
-            name,
+        const currentUser = await window.websim.getCurrentUser();
+        // Note: getList() might not be instantly consistent after create/update,
+        // but it's the most straightforward way to find the user's record here.
+        // A more robust solution might involve caching userRecord in a state variable.
+        const userRecords = room.collection('user_data_v2').getList();
+        const userRecord = userRecords.find(r => r.username === currentUser.username);
+        
+        const newTtsId = 'tts_' + Date.now() + Math.random().toString(36).substring(2, 9);
+        const newTtsAsset = {
+            name: `TTS: ${text.substring(0, 20)}${text.length > 20 ? '...' : ''}`,
             src: result.url,
             text,
             voice: ttsVoiceSelect.value,
             tags: ['tts', 'user-generated']
-        });
+        };
+
+        if (userRecord) {
+            const newTtsAssets = { ...(userRecord.tts_assets || {}), [newTtsId]: newTtsAsset };
+            await room.collection('user_data_v2').update(userRecord.id, { tts_assets: newTtsAssets });
+        } else {
+            await room.collection('user_data_v2').create({
+                tts_assets: { [newTtsId]: newTtsAsset },
+                favorites: {}
+            });
+        }
         
         ttsTextInput.value = '';
         ttsGenerator.classList.add('hidden');
@@ -277,15 +293,25 @@ window.addEventListener('resize', updateScrollButtons);
 async function initApp() {
     await favoritesManager.init();
 
-    room.collection('tts_assets_v1').subscribe(ttsRecords => {
-        const mappedTtsRecords = ttsRecords.map(record => ({
-            ...record,
-            id: record.id // ensure id is consistent for favorites
-        })).reverse(); // newest first
+    room.collection('user_data_v2').subscribe(userRecords => {
+        const allTtsAssets = [];
+        userRecords.forEach(record => {
+            if (record.tts_assets) {
+                Object.entries(record.tts_assets).forEach(([id, ttsData]) => {
+                    allTtsAssets.push({
+                        ...ttsData,
+                        id: id,
+                    });
+                });
+            }
+        });
         
-        combinedAudioLibrary = [...audioLibrary, ...mappedTtsRecords];
+        // Sort TTS assets by ID (which includes a timestamp) to show newest first
+        allTtsAssets.sort((a, b) => b.id.localeCompare(a.id));
         
-        // Re-render if something might have changed
+        combinedAudioLibrary = [...audioLibrary, ...allTtsAssets];
+        
+        // Re-render if the gallery is visible
         if (document.querySelector('.audio-card')) {
              filterAndRender();
         }

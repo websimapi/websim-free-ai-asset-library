@@ -15,27 +15,29 @@ const RECENT_TAGS_STORAGE_KEY = 'audioFilterUsage';
 
 // --- Audio Data Generation ---
 async function buildAudioDataFromAssets() {
-    // This function assumes audio assets are available and their paths can be retrieved.
-    // In this environment, we will list them manually as a stand-in for a file manifest.
-    const assetPaths = [
-        'laser_shot__sci-fi_weapon_short_fx.mp3',
-        'coin_pickup__game_positive_ui_collect.mp3',
-        'jump__game_character_movement_short.mp3',
-        'explosion__game_weapon_fx_impact.mp3',
-        'power_up__game_positive_fx_collect.mp3',
-        'hit_damage__game_negative_fx_impact.mp3',
-        'menu_select__ui_short_game.mp3',
-        'footsteps_grass__character_movement_loop.mp3',
-        'sword_swing__weapon_character_short_fx.mp3',
-        'magic_spell__magic_fx_positive_game.mp3',
-        'alert_notification__ui_notification_short.mp3',
-        'ambient_forest__ambience_nature_loop.mp3',
-        'ui_confirm__ui_positive_short.mp3',
-        'ui_error__ui_negative_short.mp3',
-    ];
+    // Dynamically find all audio elements that follow the naming convention
+    const audioElements = Array.from(document.querySelectorAll('audio[src*="__"]'));
+    const assetPaths = audioElements.map(audio => audio.getAttribute('src'));
 
-    audioData = assetPaths.map((path, index) => {
-        const [namePart, tagsPart] = path.replace('.mp3', '').split('__');
+    // If no audio elements are found (e.g., in a development environment without them in the DOM),
+    // we can use a fetch to a non-existent file to trigger a directory listing from the server.
+    // This is a fallback and might not work in all environments.
+    if (assetPaths.length === 0) {
+        try {
+            const response = await fetch('/?list-files');
+            const files = await response.json();
+            const audioFiles = files.filter(file => file.endsWith('.mp3') && file.includes('__'));
+            assetPaths.push(...audioFiles);
+        } catch (e) {
+            console.error("Could not fetch file list. No audio assets will be loaded.");
+            // In a real production scenario, you might want to hardcode a minimal list here as a further fallback.
+            return;
+        }
+    }
+
+    audioData = [...new Set(assetPaths)].map((path, index) => {
+        const fileName = path.split('/').pop(); // Get filename from path
+        const [namePart, tagsPart] = fileName.replace('.mp3', '').split('__');
         const name = namePart.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         const tags = tagsPart ? tagsPart.split('_') : [];
         

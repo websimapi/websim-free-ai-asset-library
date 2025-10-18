@@ -47,7 +47,18 @@ const d=[
     {id:46,name:'Fire Impact',src:'fire_impact.mp3',tags:['magic','damage','fx','impact','short']},
     {id:47,name:'Rapid Laser Fire',src:'rapid_laser_fire.mp3',tags:['sci-fi','weapon','fx']},
     {id:48,name:'Wind Chime Puzzle',src:'wind_chime_puzzle.mp3',tags:['ambience','puzzle','positive','fx']},
-    {id:49,name:'Slime Squish',src:'slime_squish.mp3',tags:['creature','environment','movement','fx','short']}
+    {id:49,name:'Slime Squish',src:'slime_squish.mp3',tags:['creature','environment','movement','fx','short']},
+    {id:50,name:'Ammo Pickup',src:'ammo_pickup.mp3',tags:['game','inventory','short','fx']},
+    {id:51,name:'Generator Hum',src:'generator_hum.mp3',tags:['ambience','industrial','loop','environment']},
+    {id:52,name:'Ice Freeze',src:'ice_freeze.mp3',tags:['magic','fx','short','environment']},
+    {id:53,name:'Ghost Whisper',src:'ghost_whisper.mp3',tags:['creature','ambient','spooky']},
+    {id:54,name:'Mech Door Close',src:'mechanical_door_close.mp3',tags:['environment','mechanism','interaction']},
+    {id:55,name:'Chains Rattle',src:'chain_rattle.mp3',tags:['environment','interaction','dungeon','fx']},
+    {id:56,name:'Clock Ticking',src:'clock_ticking.mp3',tags:['ambience','loop','suspense','ui']},
+    {id:57,name:'Water Drip',src:'water_drip.mp3',tags:['ambience','environment','short']},
+    {id:58,name:'Whoosh Upward',src:'whoosh_upward.mp3',tags:['movement','fx','short','game']},
+    {id:59,name:'Creature Squeak',src:'creature_squeak.mp3',tags:['creature','short','fx']},
+    {id:60,name:'Quill Writing',src:'quill_writing.mp3',tags:['ui','interaction','story','loop']}
 ];
 
 const g=document.getElementById('gallery'),

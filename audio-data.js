@@ -109,5 +109,8 @@ export const audioLibrary = [
     {id:108,name:'Ticking Timer',src:'ticking_timer.mp3',tags:['time','mechanism','tension','short','fx']},
     {id:109,name:'Rising Drone Swell',src:'rising_drone_swell.mp3',tags:['ambience','spooky','tension','fx']},
     {id:110,name:'Muffled Screams',src:'muffled_screams.mp3',tags:['spooky','creature','tension','ambient']},
-    {id:111,name:'Metallic Scrape Acceleration',src:'metallic_scrape_acceleration.mp3',tags:['industrial','mechanism','tension','fx']}
+    {id:111,name:'Metallic Scrape Acceleration',src:'metallic_scrape_acceleration.mp3',tags:['industrial','mechanism','tension','fx']},
+    {id:112,name:'Key Jingle',src:'key_jingle.mp3',tags:['game','collect','interaction','short','fx']},
+    {id:113,name:'Gem Acquire',src:'gem_acquire.mp3',tags:['game','collect','magic','positive','fx']},
+    {id:114,name:'Blueprint Roll',src:'blueprint_roll.mp3',tags:['game','collect','ui','interaction','short']}
 ];

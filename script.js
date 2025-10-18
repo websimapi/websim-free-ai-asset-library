@@ -12,7 +12,11 @@ const d=[
     {id:11,name:'Alert Notification',src:'alert_notification.mp3',tags:['ui','notification','short']},
     {id:12,name:'Ambient Forest',src:'ambient_forest.mp3',tags:['ambience','nature','loop']},
     {id:13,name:'UI Confirm',src:'ui_confirm.mp3',tags:['ui','positive','short']},
-    {id:14,name:'UI Error',src:'ui_error.mp3',tags:['ui','negative','short']}
+    {id:14,name:'UI Error',src:'ui_error.mp3',tags:['ui','negative','short']},
+    {id:15,name:'Heal Gain',src:'heal_gain.mp3',tags:['game','positive','fx','health']},
+    {id:16,name:'Chest Open',src:'chest_open.mp3',tags:['game','collect','interaction','fx']},
+    {id:17,name:'Water Splash',src:'water_splash.mp3',tags:['game','movement','environment','short']},
+    {id:18,name:'Fast Whoosh',src:'whoosh_fast.mp3',tags:['game','movement','fx','short']}
 ];
 
 const g=document.getElementById('gallery'),

@@ -12,7 +12,16 @@ const d=[
     {id:11,name:'Alert Notification',src:'alert_notification.mp3',tags:['ui','notification','short']},
     {id:12,name:'Ambient Forest',src:'ambient_forest.mp3',tags:['ambience','nature','loop']},
     {id:13,name:'UI Confirm',src:'ui_confirm.mp3',tags:['ui','positive','short']},
-    {id:14,name:'UI Error',src:'ui_error.mp3',tags:['ui','negative','short']}
+    {id:14,name:'UI Error',src:'ui_error.mp3',tags:['ui','negative','short']},
+    {id:15,name:'Laser Burst',src:'laser_shot.mp3',tags:['game','sci-fi','weapon','burst']},
+    {id:16,name:'Small Impact',src:'hit_damage.mp3',tags:['game','impact','fx','short']},
+    {id:17,name:'Treasure Chime',src:'coin_pickup.mp3',tags:['game','positive','treasure','ui']},
+    {id:18,name:'Forest Ambience Loop',src:'ambient_forest.mp3',tags:['game','ambience','nature','loop']},
+    {id:19,name:'Sword Clang',src:'sword_swing.mp3',tags:['game','weapon','metal','fx']},
+    {id:20,name:'Spell Cast Short',src:'magic_spell.mp3',tags:['game','magic','fx','short']},
+    {id:21,name:'Power Surge',src:'power_up.mp3',tags:['game','positive','fx','charge']},
+    {id:22,name:'UI Dismiss',src:'ui_error.mp3',tags:['ui','negative','short','game']},
+    {id:23,name:'Footstep Loop',src:'footsteps_grass.mp3',tags:['game','movement','loop','character']}
 ];
 
 const g=document.getElementById('gallery'),

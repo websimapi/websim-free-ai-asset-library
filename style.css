@@ -5,6 +5,11 @@ body{font-family:'Inter',sans-serif;background-color:var(--background-color);col
 header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border-color);margin-bottom:1.5rem}
 header h1{font-size:1.75rem;font-weight:600}
 header p{color:var(--text-muted-color);font-size:.9rem;max-width:400px}
+.header-actions{
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
 #request-audio-btn,#generate-tts-btn{display:inline-flex;align-items:center;gap:.5rem;background-color:var(--primary-color);color:white;border:none;border-radius:8px;padding:.75rem 1.25rem;font-size:1rem;font-weight:600;cursor:pointer;transition:background-color .2s ease}
 #request-audio-btn:hover,#generate-tts-btn:hover{background-color:var(--primary-hover-color)}
 #generate-tts-btn{background-color:#1e1e1e;border:1px solid var(--border-color)}
@@ -60,7 +65,7 @@ header p{color:var(--text-muted-color);font-size:.9rem;max-width:400px}
 .generate-button:disabled{background-color:var(--primary-hover-color);cursor:not-allowed;opacity:.7}
 .loader{width:20px;height:20px;border:2px solid #fff;border-bottom-color:transparent;border-radius:50%;display:inline-block;box-sizing:border-box;animation:rotation 1s linear infinite}
 @keyframes rotation{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-@media(max-width:640px){#app-container{padding:.75rem}header{flex-direction:column;align-items:stretch;gap:1rem;margin-bottom:1.5rem}header h1{font-size:1.5rem}header p{font-size:.875rem;max-width:100%}#request-audio-btn,#generate-tts-btn{width:100%;padding:.85rem;justify-content:center}.controls{margin-bottom:1.5rem}#search-input{font-size:.95rem}.tag-filters{gap:.4rem}.tag-filters button{padding:.4rem .8rem;font-size:.85rem}.gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}.audio-card{padding:.75rem;gap:.5rem;position:relative}
+@media(max-width:640px){#app-container{padding:.75rem}header{flex-direction:column;align-items:stretch;gap:1rem;margin-bottom:1.5rem}header h1{font-size:1.5rem}header p{font-size:.875rem;max-width:100%}.header-actions{width:100%}#request-audio-btn,#generate-tts-btn{flex: 1; width: auto; padding:.85rem;justify-content:center}.controls{margin-bottom:1.5rem}#search-input{font-size:.95rem}.tag-filters{gap:.4rem}.tag-filters button{padding:.4rem .8rem;font-size:.85rem}.gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}.audio-card{padding:.75rem;gap:.5rem;position:relative}
 .download-button{top:8px;left:8px;width:26px;height:26px}
 .download-button svg{width:14px;height:14px}
 .favorite-section{top:8px;right:8px}

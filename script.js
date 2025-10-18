@@ -59,7 +59,10 @@ const d=[
     {id:58,name:'Shield Activate',src:'shield_activate.mp3',tags:['positive', 'status', 'defense', 'fx']},
     {id:59,name:'Aggressive Warp Out',src:'warp_out_aggressive.mp3',tags:['sci-fi', 'teleport', 'fx', 'impact']},
     {id:60,name:'Ethereal Arrival',src:'ethereal_arrival.mp3',tags:['magic', 'teleport', 'fx', 'short']},
-    {id:61,name:'Teleport Glitch',src:'teleport_glitch.mp3',tags:['sci-fi', 'teleport', 'negative', 'fx']}
+    {id:61,name:'Teleport Glitch',src:'teleport_glitch.mp3',tags:['sci-fi', 'teleport', 'negative', 'fx']},
+    {id:62,name:'Force Field Recharge',src:'force_field_recharge.mp3',tags:['sci-fi', 'defense', 'fx', 'status']},
+    {id:63,name:'Magic Ward Deflect',src:'magic_ward_deflect.mp3',tags:['magic', 'defense', 'impact', 'fx']},
+    {id:64,name:'Heavy Armor Hit',src:'heavy_armor_hit.mp3',tags:['defense', 'impact', 'armor', 'fx']}
 ];
 
 const g=document.getElementById('gallery'),

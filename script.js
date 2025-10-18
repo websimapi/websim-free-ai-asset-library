@@ -32,7 +32,12 @@ const d=[
     {id:31,name:'Item Drop',src:'item_drop.mp3',tags:['game','interaction','fx','short']},
     {id:32,name:'Door Creak',src:'door_creak.mp3',tags:['environment','interaction','game']},
     {id:33,name:'Shield Block',src:'shield_block.mp3',tags:['game','weapon','defense','impact']},
-    {id:34,name:'Level Up',src:'level_up.mp3',tags:['game','positive','ui','reward']}
+    {id:34,name:'Level Up',src:'level_up.mp3',tags:['game','positive','ui','reward']},
+    {id:35,name:'Gravel Footsteps',src:'gravel_footsteps.mp3',tags:['character','movement','environment','loop']},
+    {id:36,name:'Winch Crank',src:'winch_crank.mp3',tags:['mechanism','interaction','fx']},
+    {id:37,name:'Poison Debuff',src:'poison_debuff.mp3',tags:['magic','negative','fx','status']},
+    {id:38,name:'Item Equip',src:'item_equip.mp3',tags:['ui','inventory','interaction']},
+    {id:39,name:'Victory Fanfare',src:'victory_fanfare.mp3',tags:['game','positive','ui','reward']}
 ];
 
 const g=document.getElementById('gallery'),

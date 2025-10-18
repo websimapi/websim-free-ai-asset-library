@@ -23,17 +23,12 @@ const d=[
     {id:22,name:'Power Down',src:'power_down.mp3',tags:['game','negative','fx']},
     {id:23,name:'Teleport',src:'teleport.mp3',tags:['game','magic','fx','short']},
     {id:24,name:'Metal Clank',src:'metal_clank.mp3',tags:['game','weapon','impact','fx']},
-    {id:25,name:'Sword Clash',src:'asset_sword_clash.mp3',tags:['game','weapon','impact','melee']},
-    {id:26,name:'Battle Cry',src:'asset_battle_cry.mp3',tags:['game','voice','combat','short']},
-    {id:27,name:'Potion Drink',src:'asset_potion_drink.mp3',tags:['game','item','health','fx']},
-    {id:28,name:'Arrow Hit',src:'asset_arrow_hit.mp3',tags:['game','weapon','impact','short']},
-    {id:29,name:'Shield Block',src:'asset_shield_block.mp3',tags:['game','weapon','defense','impact']},
-    {id:30,name:'Dagger Throw',src:'dagger_throw.mp3',tags:['game','weapon','short','fx']},
-    {id:31,name:'Gear Spin',src:'gear_spin.mp3',tags:['game','mechanical','ambient','loop']},
-    {id:32,name:'Fireball Cast',src:'fireball_cast.mp3',tags:['game','magic','weapon','fx']},
-    {id:33,name:'Ice Crackle',src:'ice_crackle.mp3',tags:['game','magic','environment','fx']},
-    {id:34,name:'Door Creak',src:'door_creak.mp3',tags:['game','environment','interaction','fx']},
-    {id:35,name:'Crowd Cheer',src:'crowd_cheer.mp3',tags:['game','voice','positive','ambient']}
+    {id:25,name:'Sword Clash',src:'sword_clash.mp3',tags:['weapon','impact','fx','short']},
+    {id:26,name:'Glass Break',src:'glass_break.mp3',tags:['environment','fx','impact','short']},
+    {id:27,name:'Sci‑Fi Beam',src:'sci_fi_beam.mp3',tags:['sci-fi','weapon','fx','short']},
+    {id:28,name:'Monster Roar',src:'monster_roar.mp3',tags:['creature','ambient','impact','game']},
+    {id:29,name:'Ambient Cave',src:'ambient_cave.mp3',tags:['ambience','environment','loop']},
+    {id:30,name:'Electric Zap',src:'electric_zap.mp3',tags:['fx','electronic','short','game']}
 ];
 
 const g=document.getElementById('gallery'),

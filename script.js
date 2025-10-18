@@ -62,7 +62,10 @@ const d=[
     {id:61,name:'Teleport Glitch',src:'teleport_glitch.mp3',tags:['sci-fi', 'teleport', 'negative', 'fx']},
     {id:62,name:'Force Field Recharge',src:'force_field_recharge.mp3',tags:['sci-fi', 'defense', 'fx', 'status']},
     {id:63,name:'Magic Ward Deflect',src:'magic_ward_deflect.mp3',tags:['magic', 'defense', 'impact', 'fx']},
-    {id:64,name:'Heavy Armor Hit',src:'heavy_armor_hit.mp3',tags:['defense', 'impact', 'armor', 'fx']}
+    {id:64,name:'Heavy Armor Hit',src:'heavy_armor_hit.mp3',tags:['defense', 'impact', 'armor', 'fx']},
+    {id:65,name:'Chain Armor Jingle',src:'chain_armor_jingle.mp3',tags:['armor', 'movement', 'fx', 'loop']},
+    {id:66,name:'Plate Armor Walk',src:'plate_armor_clank.mp3',tags:['armor', 'movement', 'heavy', 'fx']},
+    {id:67,name:'Armor Shatter',src:'armor_shatter.mp3',tags:['armor', 'negative', 'impact', 'fx']}
 ];
 
 const g=document.getElementById('gallery'),

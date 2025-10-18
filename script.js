@@ -16,20 +16,20 @@ const RECENT_TAGS_STORAGE_KEY = 'audioFilterUsage';
 // --- Audio Data Generation ---
 function buildAudioDataFromAssets() {
     const assetPaths = [
-        './alert_notification__ui_notification_short.mp3',
-        './ambient_forest__ambience_nature_loop.mp3',
-        './coin_pickup__game_positive_ui_collect.mp3',
-        './explosion__game_weapon_fx_impact.mp3',
-        './footsteps_grass__character_movement_loop.mp3',
-        './hit_damage__game_negative_fx_impact.mp3',
-        './jump__game_character_movement_short.mp3',
-        './laser_shot__sci-fi_weapon_short_fx.mp3',
-        './magic_spell__magic_fx_positive_game.mp3',
-        './menu_select__ui_short_game.mp3',
-        './power_up__game_positive_fx_collect.mp3',
-        './sword_swing__weapon_character_short_fx.mp3',
-        './ui_confirm__ui_positive_short.mp3',
-        './ui_error__ui_negative_short.mp3'
+      './alert_notification__ui_notification_short.mp3',
+      './footsteps_grass__character_movement_loop.mp3',
+      './hit_damage__game_negative_fx_impact.mp3',
+      './power_up__game_positive_fx_collect.mp3',
+      './laser_shot__sci-fi_weapon_short_fx.mp3',
+      './jump__game_character_movement_short.mp3',
+      './explosion__game_weapon_fx_impact.mp3',
+      './ui_error__ui_negative_short.mp3',
+      './magic_spell__magic_fx_positive_game.mp3',
+      './ui_confirm__ui_positive_short.mp3',
+      './ambient_forest__ambience_nature_loop.mp3',
+      './sword_swing__weapon_character_short_fx.mp3',
+      './coin_pickup__game_positive_ui_collect.mp3',
+      './menu_select__ui_short_game.mp3'
     ];
 
     audioData = assetPaths.map((path, index) => {

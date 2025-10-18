@@ -7,7 +7,7 @@ const d=[
     {id:6,name:'Hit Damage',src:'hit_damage.mp3',tags:['game','negative','fx','impact']},
     {id:7,name:'Menu Select',src:'menu_select.mp3',tags:['ui','short','game']},
     {id:8,name:'Footsteps',src:'footsteps_grass.mp3',tags:['character','movement','loop']},
-    {id:9,name:'Anvil',src:'sword_swing.mp3',tags:['weapon','character','short','fx']},
+    {id:9,name:'Sword Swing',src:'sword_swing.mp3',tags:['weapon','character','short','fx']},
     {id:10,name:'Magic Spell',src:'magic_spell.mp3',tags:['magic','fx','positive','game']},
     {id:11,name:'Alert Notification',src:'alert_notification.mp3',tags:['ui','notification','short']},
     {id:12,name:'Ambient Forest',src:'ambient_forest.mp3',tags:['ambience','nature','loop']},
@@ -53,12 +53,10 @@ const d=[
     {id:52,name:'Ice Freeze',src:'ice_freeze.mp3',tags:['magic','fx','short','environment']},
     {id:53,name:'Ghost Whisper',src:'ghost_whisper.mp3',tags:['creature','ambient','spooky']},
     {id:54,name:'Mech Door Close',src:'mechanical_door_close.mp3',tags:['environment','mechanism','interaction']},
-    {id:55,name:'Chains Rattle',src:'chain_rattle.mp3',tags:['environment','interaction','dungeon','fx']},
-    {id:56,name:'Clock Ticking',src:'clock_ticking.mp3',tags:['ambience','loop','suspense','ui']},
-    {id:57,name:'Water Drip',src:'water_drip.mp3',tags:['ambience','environment','short']},
-    {id:58,name:'Whoosh Upward',src:'whoosh_upward.mp3',tags:['movement','fx','short','game']},
-    {id:59,name:'Creature Squeak',src:'creature_squeak.mp3',tags:['creature','short','fx']},
-    {id:60,name:'Quill Writing',src:'quill_writing.mp3',tags:['ui','interaction','story','loop']}
+    {id:55,name:'Invisibility Stealth',src:'invisibility_stealth.mp3',tags:['magic', 'utility', 'stealth', 'fx']},
+    {id:56,name:'Haste Buff',src:'haste_buff.mp3',tags:['positive', 'status', 'movement', 'fx']},
+    {id:57,name:'Snare Debuff',src:'snare_debuff.mp3',tags:['negative', 'status', 'movement', 'fx']},
+    {id:58,name:'Shield Activate',src:'shield_activate.mp3',tags:['positive', 'status', 'defense', 'fx']}
 ];
 
 const g=document.getElementById('gallery'),

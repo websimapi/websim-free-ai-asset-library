@@ -28,7 +28,11 @@ const d=[
     {id:27,name:'Sci‑Fi Beam',src:'sci_fi_beam.mp3',tags:['sci-fi','weapon','fx','short']},
     {id:28,name:'Monster Roar',src:'monster_roar.mp3',tags:['creature','ambient','impact','game']},
     {id:29,name:'Ambient Cave',src:'ambient_cave.mp3',tags:['ambience','environment','loop']},
-    {id:30,name:'Electric Zap',src:'electric_zap.mp3',tags:['fx','electronic','short','game']}
+    {id:30,name:'Electric Zap',src:'electric_zap.mp3',tags:['fx','electronic','short','game']},
+    {id:31,name:'Item Drop',src:'item_drop.mp3',tags:['game','interaction','fx','short']},
+    {id:32,name:'Door Creak',src:'door_creak.mp3',tags:['environment','interaction','game']},
+    {id:33,name:'Shield Block',src:'shield_block.mp3',tags:['game','weapon','defense','impact']},
+    {id:34,name:'Level Up',src:'level_up.mp3',tags:['game','positive','ui','reward']}
 ];
 
 const g=document.getElementById('gallery'),

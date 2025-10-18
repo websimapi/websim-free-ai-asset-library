@@ -97,8 +97,21 @@ header p {
 
 .tag-filters {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+}
+
+/* Hide scrollbar for a cleaner look */
+.tag-filters::-webkit-scrollbar {
+    display: none;
+}
+
+.tag-filters {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .tag-filters button {
@@ -109,6 +122,8 @@ header p {
     color: var(--text-muted-color);
     cursor: pointer;
     transition: all 0.2s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .tag-filters button.active {

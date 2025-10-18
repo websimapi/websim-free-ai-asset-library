@@ -25,6 +25,37 @@ let audioContext;
 const audioBuffers = new Map();
 let activeTags = new Set();
 let currentlyPlaying = null;
+const RECENT_TAGS_STORAGE_KEY = 'audioFilterUsage';
+
+// --- Local Storage Functions ---
+function getRecentTags() {
+    try {
+        const tags = localStorage.getItem(RECENT_TAGS_STORAGE_KEY);
+        return tags ? JSON.parse(tags) : [];
+    } catch (e) {
+        console.error("Failed to parse recent tags from localStorage", e);
+        return [];
+    }
+}
+
+function saveRecentTags(tags) {
+    try {
+        localStorage.setItem(RECENT_TAGS_STORAGE_KEY, JSON.stringify(tags));
+    } catch (e) {
+        console.error("Failed to save recent tags to localStorage", e);
+    }
+}
+
+function addTagToRecent(tag) {
+    let recentTags = getRecentTags();
+    // Remove tag if it already exists to move it to the front
+    recentTags = recentTags.filter(t => t !== tag);
+    // Add the new tag to the beginning of the array
+    recentTags.unshift(tag);
+    // Optional: Limit the number of recent tags stored
+    // recentTags = recentTags.slice(0, 20); 
+    saveRecentTags(recentTags);
+}
 
 function initAudio() {
     if (!audioContext) {
@@ -111,7 +142,22 @@ function renderGallery(items) {
 }
 
 function renderTags() {
-    const allTags = new Set(audioData.flatMap(item => item.tags));
+    const allTags = [...new Set(audioData.flatMap(item => item.tags))];
+    const recentTags = getRecentTags();
+    
+    // Sort tags: recent ones first, then alphabetical for the rest
+    allTags.sort((a, b) => {
+        const indexA = recentTags.indexOf(a);
+        const indexB = recentTags.indexOf(b);
+
+        if (indexA !== -1 && indexB !== -1) { // Both are recent
+            return indexA - indexB; // Lower index (more recent) comes first
+        }
+        if (indexA !== -1) return -1; // A is recent, B is not
+        if (indexB !== -1) return 1;  // B is recent, A is not
+        return a.localeCompare(b);    // Neither is recent, sort alphabetically
+    });
+
     tagFiltersContainer.innerHTML = '';
     
     const allButton = document.createElement('button');
@@ -132,10 +178,12 @@ function renderTags() {
         button.addEventListener('click', () => {
             document.querySelector('.tag-filters button').classList.remove('active'); // Deactivate 'All' button
             button.classList.toggle('active');
+
             if (activeTags.has(tag)) {
                 activeTags.delete(tag);
             } else {
                 activeTags.add(tag);
+                addTagToRecent(tag); // Add to recent when tag is activated
             }
             if(activeTags.size === 0) {
                  allButton.classList.add('active');

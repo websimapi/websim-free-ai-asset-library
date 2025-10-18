@@ -79,7 +79,11 @@ const d=[
     {id:78,name:'Steam Release',src:'steam_release.mp3',tags:['industrial','environment','fx','short']},
     {id:79,name:'Metal Press',src:'metal_press.mp3',tags:['industrial','mechanism','heavy','impact']},
     {id:80,name:'Hydraulic Pump Loop',src:'hydraulic_pump.mp3',tags:['industrial','mechanism','loop','ambience']},
-    {id:81,name:'Wrench Drop',src:'wrench_drop.mp3',tags:['industrial','interaction','fx','short']}
+    {id:81,name:'Wrench Drop',src:'wrench_drop.mp3',tags:['industrial','interaction','fx','short']},
+    {id:82,name:'Flowing River Loop',src:'flowing_river_loop.mp3',tags:['nature','ambience','loop','environment']},
+    {id:83,name:'Owl Hoot',src:'owl_hoot.mp3',tags:['nature','creature','short','ambient']},
+    {id:84,name:'Strong Wind Howl',src:'strong_wind_howl.mp3',tags:['nature','environment','loop','weather']},
+    {id:85,name:'Gentle Rain Patter',src:'gentle_rain_patter.mp3',tags:['nature','ambience','loop','weather']}
 ];
 
 const g=document.getElementById('gallery'),

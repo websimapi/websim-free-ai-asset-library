@@ -15,8 +15,7 @@ const scrollLeftBtn = document.getElementById('scroll-left-btn');
 const scrollRightBtn = document.getElementById('scroll-right-btn');
 const requestAudioBtn = document.getElementById('request-audio-btn');
 const generateTtsBtn = document.getElementById('generate-tts-btn');
-const ttsModal = document.getElementById('tts-modal');
-const closeTtsModalBtn = document.getElementById('close-tts-modal');
+const ttsGenerator = document.getElementById('tts-generator');
 const ttsTextInput = document.getElementById('tts-text');
 const ttsVoiceSelect = document.getElementById('tts-voice');
 const ttsSubmitBtn = document.getElementById('generate-tts-submit');
@@ -175,7 +174,7 @@ tagFiltersContainer.addEventListener('mousemove', e => {
     tagFiltersContainer.scrollLeft = scrollLeft - (x - startX) * 1.5;
 });
 
-// TTS Modal Logic
+// TTS Section Logic
 const voices = [
     { value: "en-male", text: "English - Male" },
     { value: "en-female", text: "English - Female" },
@@ -240,7 +239,8 @@ async function handleTtsSubmit() {
         });
         
         ttsTextInput.value = '';
-        ttsModal.classList.add('hidden');
+        ttsGenerator.classList.add('hidden');
+        generateTtsBtn.classList.remove('active');
 
     } catch (error) {
         console.error("Failed to generate TTS:", error);
@@ -251,13 +251,10 @@ async function handleTtsSubmit() {
 }
 
 generateTtsBtn.onclick = () => {
-    populateVoices();
-    ttsModal.classList.remove('hidden');
-};
-closeTtsModalBtn.onclick = () => ttsModal.classList.add('hidden');
-ttsModal.onclick = (e) => {
-    if (e.target === ttsModal) {
-        ttsModal.classList.add('hidden');
+    ttsGenerator.classList.toggle('hidden');
+    generateTtsBtn.classList.toggle('active');
+    if (!ttsGenerator.classList.contains('hidden')) {
+        populateVoices();
     }
 };
 ttsSubmitBtn.onclick = handleTtsSubmit;

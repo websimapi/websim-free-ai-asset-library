@@ -25,6 +25,21 @@
             </button>
         </header>
         <main>
+            <div id="tts-generator" class="tts-generator hidden">
+                <h2>Generate AI Text-to-Speech</h2>
+                <div class="form-group">
+                    <label for="tts-text">Text</label>
+                    <textarea id="tts-text" rows="3" placeholder="Enter text to generate audio..." maxlength="200"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="tts-voice">Voice</label>
+                    <select id="tts-voice"></select>
+                </div>
+                <button id="generate-tts-submit" class="generate-button">
+                    <span class="btn-text">Generate</span>
+                    <span class="loader hidden"></span>
+                </button>
+            </div>
             <div class="controls">
                 <div class="search-wrapper">
                     <input type="search" id="search-input" placeholder="Search for sounds (e.g., 'laser', 'ui')">
@@ -42,25 +57,6 @@
             <div id="gallery" class="gallery"></div>
             <p id="no-results" class="hidden">No sounds found. Try a different search or filter.</p>
         </main>
-    </div>
-
-    <div id="tts-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button id="close-tts-modal" class="close-button" aria-label="Close TTS generator">&times;</button>
-            <h2>Generate AI Text-to-Speech</h2>
-            <div class="form-group">
-                <label for="tts-text">Text</label>
-                <textarea id="tts-text" rows="4" placeholder="Enter text to generate audio..." maxlength="200"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="tts-voice">Voice</label>
-                <select id="tts-voice"></select>
-            </div>
-            <button id="generate-tts-submit" class="generate-button">
-                <span class="btn-text">Generate</span>
-                <span class="loader hidden"></span>
-            </button>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js" crossorigin="anonymous"></script>

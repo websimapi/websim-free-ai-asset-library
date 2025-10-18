@@ -166,8 +166,10 @@ function filterAndRender() {
 // Event Listeners
 searchInput.addEventListener('input', filterAndRender);
 requestAudioBtn.addEventListener('click', () => {
-    // This function opens the native Websim comments UI
-    window.websim?.openComments?.();
+    // This will open the comments UI with pre-filled text for a suggestion.
+    window.websim?.postComment?.({
+        content: 'I would like to request an audio snippet for: \n\n'
+    });
 });
 
 

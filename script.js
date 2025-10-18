@@ -1,20 +1,3 @@
-const audioData = [
-    { id: 1, name: 'Laser Shot', src: 'laser_shot.mp3', tags: ['sci-fi', 'weapon', 'short', 'fx'] },
-    { id: 2, name: 'Coin Pickup', src: 'coin_pickup.mp3', tags: ['game', 'positive', 'ui', 'collect'] },
-    { id: 3, name: 'Jump', src: 'jump.mp3', tags: ['game', 'character', 'movement', 'short'] },
-    { id: 4, name: 'Explosion', src: 'explosion.mp3', tags: ['game', 'weapon', 'fx', 'impact'] },
-    { id: 5, name: 'Power Up', src: 'power_up.mp3', tags: ['game', 'positive', 'fx', 'collect'] },
-    { id: 6, name: 'Hit Damage', src: 'hit_damage.mp3', tags: ['game', 'negative', 'fx', 'impact'] },
-    { id: 7, name: 'Menu Select', src: 'menu_select.mp3', tags: ['ui', 'short', 'game'] },
-    { id: 8, name: 'Footsteps', src: 'footsteps_grass.mp3', tags: ['character', 'movement', 'loop'] },
-    { id: 9, name: 'Sword Swing', src: 'sword_swing.mp3', tags: ['weapon', 'character', 'short', 'fx'] },
-    { id: 10, name: 'Magic Spell', src: 'magic_spell.mp3', tags: ['magic', 'fx', 'positive', 'game'] },
-    { id: 11, name: 'Alert Notification', src: 'alert_notification.mp3', tags: ['ui', 'notification', 'short'] },
-    { id: 12, name: 'Ambient Forest', src: 'ambient_forest.mp3', tags: ['ambience', 'nature', 'loop'] },
-    { id: 13, name: 'UI Confirm', src: 'ui_confirm.mp3', tags: ['ui', 'positive', 'short'] },
-    { id: 14, name: 'UI Error', src: 'ui_error.mp3', tags: ['ui', 'negative', 'short'] }
-];
-
 const gallery = document.getElementById('gallery');
 const searchInput = document.getElementById('search-input');
 const tagFiltersContainer = document.getElementById('tag-filters');
@@ -23,11 +6,47 @@ const noResultsEl = document.getElementById('no-results');
 const scrollLeftBtn = document.getElementById('scroll-left-btn');
 const scrollRightBtn = document.getElementById('scroll-right-btn');
 
+let audioData = [];
 let audioContext;
 const audioBuffers = new Map();
 let activeTags = new Set();
 let currentlyPlaying = null;
 const RECENT_TAGS_STORAGE_KEY = 'audioFilterUsage';
+
+// --- Audio Data Generation ---
+async function buildAudioDataFromAssets() {
+    // This function assumes audio assets are available and their paths can be retrieved.
+    // In this environment, we will list them manually as a stand-in for a file manifest.
+    const assetPaths = [
+        'laser_shot__sci-fi_weapon_short_fx.mp3',
+        'coin_pickup__game_positive_ui_collect.mp3',
+        'jump__game_character_movement_short.mp3',
+        'explosion__game_weapon_fx_impact.mp3',
+        'power_up__game_positive_fx_collect.mp3',
+        'hit_damage__game_negative_fx_impact.mp3',
+        'menu_select__ui_short_game.mp3',
+        'footsteps_grass__character_movement_loop.mp3',
+        'sword_swing__weapon_character_short_fx.mp3',
+        'magic_spell__magic_fx_positive_game.mp3',
+        'alert_notification__ui_notification_short.mp3',
+        'ambient_forest__ambience_nature_loop.mp3',
+        'ui_confirm__ui_positive_short.mp3',
+        'ui_error__ui_negative_short.mp3',
+    ];
+
+    audioData = assetPaths.map((path, index) => {
+        const [namePart, tagsPart] = path.replace('.mp3', '').split('__');
+        const name = namePart.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        const tags = tagsPart ? tagsPart.split('_') : [];
+        
+        return {
+            id: index + 1,
+            name: name,
+            src: path,
+            tags: tags
+        };
+    });
+}
 
 // --- Local Storage Functions ---
 function getRecentTags() {
@@ -304,6 +323,7 @@ window.addEventListener('resize', updateScrollButtons);
 
 // Initial Load
 document.addEventListener('DOMContentLoaded', () => {
+    buildAudioDataFromAssets();
     renderTags();
     renderGallery(audioData);
 });

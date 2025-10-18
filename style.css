@@ -84,10 +84,9 @@ header p{color:var(--text-muted-color);font-size:.9rem;max-width:400px}
     z-index:9999;
     transition:opacity .8s ease, transform .6s ease;
     opacity:1;
-    pointer-events:none;
 }
 .cover-overlay.persist{pointer-events:none; /* stays visible, no fade */}
-.cover-overlay.fade-out{opacity:0; transform:scale(.98);}
+.cover-overlay.fade-out{opacity:0; transform:scale(.98); pointer-events:none;}
 
 /* image responsive */
 .cover-image{

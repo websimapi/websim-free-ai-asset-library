@@ -106,6 +106,12 @@ header p {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 8px;
+    cursor: grab;
+    user-select: none; /* Prevent text selection while dragging */
+}
+
+.tag-filters.grabbing {
+    cursor: grabbing;
 }
 
 /* Hide scrollbar for a cleaner look */

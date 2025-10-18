@@ -244,6 +244,37 @@ function updateScrollButtons() {
     }
 }
 
+// --- Draggable Tag Filters for Desktop ---
+let isDown = false;
+let startX;
+let scrollLeft;
+
+tagFiltersContainer.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // only for left mouse button
+    isDown = true;
+    tagFiltersContainer.classList.add('grabbing');
+    startX = e.pageX - tagFiltersContainer.offsetLeft;
+    scrollLeft = tagFiltersContainer.scrollLeft;
+});
+
+tagFiltersContainer.addEventListener('mouseleave', () => {
+    isDown = false;
+    tagFiltersContainer.classList.remove('grabbing');
+});
+
+tagFiltersContainer.addEventListener('mouseup', () => {
+    isDown = false;
+    tagFiltersContainer.classList.remove('grabbing');
+});
+
+tagFiltersContainer.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - tagFiltersContainer.offsetLeft;
+    const walk = (x - startX) * 1.5; // Multiplier for faster scroll
+    tagFiltersContainer.scrollLeft = scrollLeft - walk;
+});
+
 
 // Event Listeners
 searchInput.addEventListener('input', filterAndRender);

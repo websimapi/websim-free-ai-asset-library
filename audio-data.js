@@ -112,5 +112,10 @@ export const audioLibrary = [
     {id:111,name:'Metallic Scrape Acceleration',src:'metallic_scrape_acceleration.mp3',tags:['industrial','mechanism','tension','fx']},
     {id:112,name:'Key Jingle',src:'key_jingle.mp3',tags:['game','collect','interaction','short','fx']},
     {id:113,name:'Gem Acquire',src:'gem_acquire.mp3',tags:['game','collect','magic','positive','fx']},
-    {id:114,name:'Blueprint Roll',src:'blueprint_roll.mp3',tags:['game','collect','ui','interaction','short']}
+    {id:114,name:'Blueprint Roll',src:'blueprint_roll.mp3',tags:['game','collect','ui','interaction','short']},
+    {id:115,name:'High Speed Impact',src:'car_impact_high_speed.mp3',tags:['car','crash','impact','heavy','fx']},
+    {id:116,name:'Skid and Roll',src:'car_skid_and_roll.mp3',tags:['car','crash','skid','heavy','fx']},
+    {id:117,name:'Fender Bender',src:'car_light_fender_bender.mp3',tags:['car','crash','impact','short','fx']},
+    {id:118,name:'Explosive Wreck',src:'car_explosion_wreck.mp3',tags:['car','crash','explosion','heavy','fx']},
+    {id:119,name:'Horn and Crash',src:'car_horn_blare.mp3',tags:['car','crash','alert','fx']},
 ];

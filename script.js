@@ -315,8 +315,10 @@ async function initApp() {
         
         combinedAudioLibrary = [...audioLibrary, ...allTtsAssets];
         
-        // Always re-filter and re-render when the underlying data changes.
-        filterAndRender();
+        // Re-render if the gallery is visible
+        if (document.querySelector('.audio-card')) {
+             filterAndRender();
+        }
         renderTags();
     });
     

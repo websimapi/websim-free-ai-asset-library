@@ -92,7 +92,10 @@ const d=[
     {id:91,name:'Ominous Drone',src:'ominous_drone.mp3',tags:['spooky','ambience','loop','tension']},
     {id:92,name:'Sneak Wooden Floor',src:'sneak_wooden_floor.mp3',tags:['character','movement','stealth','loop']},
     {id:93,name:'Silent Takedown',src:'silent_takedown.mp3',tags:['character','impact','stealth','fx']},
-    {id:94,name:'Stealth Field Activate',src:'stealth_field_activate.mp3',tags:['sci-fi','electronic','stealth','fx']}
+    {id:94,name:'Stealth Field Activate',src:'stealth_field_activate.mp3',tags:['sci-fi','electronic','stealth','fx']},
+    {id:95,name:'Inventory Sort',src:'inventory_sort.mp3',tags:['ui','inventory','interaction','short']},
+    {id:96,name:'Loot Container Open',src:'loot_container_open.mp3',tags:['game','inventory','interaction','fx']},
+    {id:97,name:'Potion Consume',src:'potion_consume.mp3',tags:['game','inventory','health','fx']}
 ];
 
 const room=new WebsimSocket;

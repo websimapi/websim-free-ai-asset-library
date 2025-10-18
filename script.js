@@ -86,32 +86,65 @@ const d=[
     {id:85,name:'Gentle Rain Patter',src:'gentle_rain_patter.mp3',tags:['nature','ambience','loop','weather']}
 ];
 
-// --- Websim Setup ---
+// --- Globals ---
 const room = new WebsimSocket();
 const FAVORITES_COLLECTION = 'user_favorites_v1';
 const favoriteCollection = room.collection(FAVORITES_COLLECTION);
+
+const galleryEl = document.getElementById('gallery');
+const searchInput = document.getElementById('search-input');
+const tagFiltersEl = document.getElementById('tag-filters');
+const requestAudioBtn = document.getElementById('request-audio-btn');
+const noResultsEl = document.getElementById('no-results');
+const scrollLeftBtn = document.getElementById('scroll-left-btn');
+const scrollRightBtn = document.getElementById('scroll-right-btn');
+
+let audioContext;
+let audioBufferCache = new Map();
+let activeTags = new Set();
+let currentPlayback = null;
+let recentlyUsedTagsKey = 'audioFilterUsage';
+
 let currentUserFavoritesRecord = null;
 let allFavoritesRecords = [];
 let assetFavoriteCounts = {};
-let currentUserName = null; 
-// ---------------------
+let currentUserName = null;
 
-const g=document.getElementById('gallery'),
-si=document.getElementById('search-input'),
-tf=document.getElementById('tag-filters'),
-rb=document.getElementById('request-audio-btn'),
-nr=document.getElementById('no-results'),
-lb=document.getElementById('scroll-left-btn'),
-rb2=document.getElementById('scroll-right-btn');
+let isDragging = false, startX, scrollLeft;
 
-let ac,ab=new Map(),at=new Set(),cp=null,k='audioFilterUsage',iD=!1,sX,sL;
+// --- Core Functions ---
 
-const gr=()=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}},
-sr=t=>{try{localStorage.setItem(k,JSON.stringify(t))}catch(e){}},
-ar=t=>{let r=gr().filter(x=>x!==t);r.unshift(t);sr(r)},
-ia=()=>{ac||(ac=new(window.AudioContext||window.webkitAudioContext)())},
-la=async u=>{if(ab.has(u))return ab.get(u);try{const r=await fetch(u),a=await r.arrayBuffer(),b=await ac.decodeAudioData(a);ab.set(u,b);return b}catch(e){console.error(`Error loading ${u}:`,e)}},
-ps=(b,btn)=>{if(!ac)return;cp?.source?.stop();cp?.button?.classList.remove('playing');const s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);btn.classList.add('playing');s.onended=()=>{btn.classList.remove('playing');cp?.source===s&&(cp=null)};cp={source:s,button:btn}};
+const getRecentTags = () => { try { return JSON.parse(localStorage.getItem(recentlyUsedTagsKey) || '[]') } catch (e) { return [] } };
+const saveRecentTags = tags => { try { localStorage.setItem(recentlyUsedTagsKey, JSON.stringify(tags)) } catch (e) { console.error("Could not save tags", e) } };
+const addRecentTag = tag => { let tags = getRecentTags().filter(x => x !== tag); tags.unshift(tag); saveRecentTags(tags) };
+const initAudioContext = () => { if (!audioContext) { audioContext = new (window.AudioContext || window.webkitAudioContext)() } };
+const loadAudio = async (url) => {
+    if (audioBufferCache.has(url)) return audioBufferCache.get(url);
+    try {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        audioBufferCache.set(url, audioBuffer);
+        return audioBuffer;
+    } catch (e) { console.error(`Error loading ${url}:`, e) }
+};
+const playSound = (buffer, button) => {
+    if (!audioContext) return;
+    currentPlayback?.source?.stop();
+    currentPlayback?.button?.classList.remove('playing');
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+    button.classList.add('playing');
+    source.onended = () => {
+        button.classList.remove('playing');
+        if (currentPlayback?.source === source) {
+            currentPlayback = null;
+        }
+    };
+    currentPlayback = { source, button };
+};
 
 // --- Favorites Logic ---
 const getCurrentUser = async () => {
@@ -143,14 +176,12 @@ const isFavoritedByCurrentUser = (assetId) => {
 const handleAllFavoritesUpdate = async (records) => {
     allFavoritesRecords = records;
     calculateFavoriteCounts(records);
-    
     const user = await getCurrentUser();
     if (user && user.username) {
         currentUserFavoritesRecord = records.find(r => r.username === user.username) || null;
     }
-
-    fr(); // Re-render the gallery to update counts, icons, and filter results
-    rt(); // Re-render tags to ensure 'Favorites' filter state is correct
+    filterAndRenderGallery();
+    renderTags();
 };
 
 const toggleFavorite = async (assetId) => {
@@ -160,223 +191,192 @@ const toggleFavorite = async (assetId) => {
         return;
     }
 
-    // 1. Prepare new favorites data
     const favoritesData = currentUserFavoritesRecord ? { ...currentUserFavoritesRecord.favorites } : {};
-    const currentState = !!favoritesData[assetId];
-
-    if (currentState) {
+    if (favoritesData[assetId]) {
         delete favoritesData[assetId];
     } else {
         favoritesData[assetId] = true;
     }
-    
     const newPayload = { favorites: favoritesData };
 
-    // 2. Optimistic update
-    // Update local state temporarily for fast feedback
-    const oldRecord = currentUserFavoritesRecord;
     if (currentUserFavoritesRecord) {
-        currentUserFavoritesRecord = { 
-            ...currentUserFavoritesRecord, 
-            favorites: favoritesData 
-        };
+        await favoriteCollection.update(currentUserFavoritesRecord.id, newPayload);
     } else {
-        // Mock a temporary record ID if creating for the first time
-        currentUserFavoritesRecord = { 
-            id: 'temp_id', 
-            username: user.username, 
-            favorites: favoritesData 
-        };
-    }
-    // Since global counts depend on allFavoritesRecords, we update counts manually for optimistic rendering
-    // This is complex and relies on the update being fast. Let's skip local count modification and rely on the UI update triggered by `fr()` to show the state change.
-
-    fr(); 
-
-    // 3. Perform persistence update/create
-    try {
-        if (oldRecord) {
-            await favoriteCollection.update(oldRecord.id, newPayload);
-        } else {
-            await favoriteCollection.create(newPayload);
-        }
-    } catch (e) {
-        console.error("Failed to update favorites:", e);
-        // If it fails, rely on the next subscription update to revert the optimistic change, or handle notification.
+        await favoriteCollection.create(newPayload);
     }
 };
 
 const setupSubscriptions = () => {
     favoriteCollection.subscribe(handleAllFavoritesUpdate);
 };
-// ---------------------
 
-rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(x=>{
-    const c=document.createElement('div');
-    c.className='audio-card';
-    
-    const assetIdString = x.id.toString();
-    const isFav = isFavoritedByCurrentUser(assetIdString);
-    const favCount = assetFavoriteCounts[assetIdString] || 0;
+// --- Rendering & Filtering ---
 
-    // Download Button
-    const dl=document.createElement('a');
-    dl.href=x.src;
-    dl.download=x.name.replace(/ /g, '_')+'.mp3';
-    dl.className='download-button';
-    dl.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
-    
-    // Favorite Group (Top Right)
-    const topRightGroup = document.createElement('div');
-    topRightGroup.className = 'favorite-group';
-    
-    const fb = document.createElement('button');
-    fb.className = 'favorite-button';
-    // Heart icon SVG (fill="none" initially)
-    fb.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
-    
-    if (isFav) {
-        fb.classList.add('favorited');
-        // Fill the heart SVG path when favorited
-        fb.querySelector('path').setAttribute('fill', 'currentColor');
+const updateScrollButtons = () => {
+    if (!scrollLeftBtn || !scrollRightBtn || !tagFiltersEl) return;
+    const { scrollWidth, clientWidth, scrollLeft } = tagFiltersEl;
+    const isScrollable = scrollWidth > clientWidth;
+    if (!isScrollable) {
+        scrollLeftBtn.classList.remove('visible');
+        scrollRightBtn.classList.remove('visible');
+        return;
     }
-    
-    fb.onclick = (e) => {
-        e.stopPropagation();
-        toggleFavorite(assetIdString);
-    };
+    scrollLeftBtn.classList.toggle('visible', scrollLeft > 0);
+    scrollRightBtn.classList.toggle('visible', scrollLeft < scrollWidth - clientWidth - 1);
+};
 
-    // Favorite Count
-    const countDisplay = document.createElement('span');
-    countDisplay.className = 'favorite-count';
-    countDisplay.textContent = favCount;
-    
-    topRightGroup.append(fb, countDisplay);
+const renderGallery = (items) => {
+    galleryEl.innerHTML = '';
+    noResultsEl.classList.toggle('hidden', items.length > 0);
+    items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'audio-card';
+        const assetIdString = item.id.toString();
+        const isFav = isFavoritedByCurrentUser(assetIdString);
+        const favCount = assetFavoriteCounts[assetIdString] || 0;
 
-    // Play Button
-    const b=document.createElement('button');
-    b.className='play-button';
-    b.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5v14l11-7z"></path></svg>';
-    b.onclick=async()=>{ia();const bf=await la(x.src);bf&&ps(bf,b)};
-    
-    // Name
-    const n=document.createElement('div');n.className='audio-name';n.textContent=x.name;
-    
-    c.append(dl, topRightGroup, b, n);
-    g.appendChild(c)})},
-rt=()=>{const a=[...new Set(d.flatMap(x=>x.tags))],r=gr();a.sort((x,y)=>{const ix=r.indexOf(x),iy=r.indexOf(y);return ix!==-1&&iy!==-1?ix-iy:ix!==-1?-1:iy!==-1?1:x.localeCompare(y)});tf.innerHTML='';
-    
-    // 1. ALL button
-    const ab=document.createElement('button');ab.textContent='All';ab.classList.add('active');
-    ab.onclick=()=>{
-        at.clear();
-        document.querySelectorAll('.tag-filters button').forEach(b=>b.classList.remove('active'));
-        ab.classList.add('active');
-        fr();
-    };
-    tf.appendChild(ab);
-    
-    // 2. FAVORITES button
-    const favTagKey = '_favorites_';
-    const fb=document.createElement('button');
-    fb.textContent='Favorites';
-    fb.dataset.tag=favTagKey;
-    
-    const isFavoritesActive = at.has(favTagKey);
-    if (isFavoritesActive) {
-        fb.classList.add('active');
-        ab.classList.remove('active');
-    }
+        card.innerHTML = `
+            <a href="${item.src}" download="${item.name.replace(/ /g, '_')}.mp3" class="download-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </a>
+            <div class="favorite-group">
+                <button class="favorite-button ${isFav ? 'favorited' : ''}" data-asset-id="${assetIdString}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="${isFav ? 'currentColor' : 'none'}"></path>
+                    </svg>
+                </button>
+                <span class="favorite-count">${favCount}</span>
+            </div>
+            <button class="play-button" data-src="${item.src}">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5v14l11-7z"></path></svg>
+            </button>
+            <div class="audio-name">${item.name}</div>
+        `;
 
-    fb.onclick=()=>{
-        const wasActive = at.has(favTagKey);
-        
-        // Clear all filters first
-        at.clear();
-        document.querySelectorAll('.tag-filters button').forEach(b=>b.classList.remove('active'));
-        
-        if (!wasActive) {
-            at.add(favTagKey);
-            fb.classList.add('active');
-        } else {
-            ab.classList.add('active');
-        }
-        
-        fr();
-    };
-    tf.appendChild(fb);
-    
-    // 3. Regular tags
-    a.forEach(t=>{
-        const b=document.createElement('button');
-        b.textContent=t;b.dataset.tag=t;
-        
-        if (at.has(t) && !isFavoritesActive) {
-            b.classList.add('active');
-            ab.classList.remove('active');
-        }
-        
-        b.onclick=()=>{
-            // If favorites was active, clear it
-            if (at.has(favTagKey)) {
-                at.delete(favTagKey);
-                document.querySelector(`button[data-tag='${favTagKey}']`).classList.remove('active');
-            }
-            
-            document.querySelector('.tag-filters button').classList.remove('active'); // Deactivate 'All'
-            b.classList.toggle('active');
-            at.has(t)?at.delete(t):(at.add(t),ar(t));
-            
-            // Re-activate 'All' if no other filter is selected
-            !at.size && ab.classList.add('active');
-            
-            fr();
+        galleryEl.appendChild(card);
+    });
+
+    // Add event listeners after rendering
+    galleryEl.querySelectorAll('.play-button').forEach(button => {
+        button.onclick = async (e) => {
+            initAudioContext();
+            const src = e.currentTarget.dataset.src;
+            const buffer = await loadAudio(src);
+            if (buffer) playSound(buffer, e.currentTarget);
         };
-        tf.appendChild(b);
     });
-    us()
-},
-fr=()=>{
-    const s=si.value.toLowerCase().trim();
+
+    galleryEl.querySelectorAll('.favorite-button').forEach(button => {
+        button.onclick = (e) => {
+            e.stopPropagation();
+            toggleFavorite(e.currentTarget.dataset.assetId);
+        };
+    });
+};
+
+const renderTags = () => {
+    const allTags = [...new Set(d.flatMap(x => x.tags))];
+    const recentTags = getRecentTags();
+    allTags.sort((a, b) => {
+        const ixA = recentTags.indexOf(a), ixB = recentTags.indexOf(b);
+        return (ixA !== -1 && ixB !== -1) ? ixA - ixB : ixA !== -1 ? -1 : ixB !== -1 ? 1 : a.localeCompare(b);
+    });
+    
+    tagFiltersEl.innerHTML = '';
     const favTagKey = '_favorites_';
-    const favoritesFilterActive = at.has(favTagKey);
 
-    const f=d.filter(x=>{
-        const assetIdString = x.id.toString();
-        
-        // 1. Filter by search input (Name OR Tag match)
-        const matchesSearchInput = !s || (x.name.toLowerCase().includes(s) || x.tags.some(t => t.toLowerCase().includes(s)));
-        
-        if (!matchesSearchInput) return false;
-        
-        // 2. Filter by Favorites status
-        if (favoritesFilterActive) {
-            return isFavoritedByCurrentUser(assetIdString);
-        }
-        
-        // 3. Filter by regular tags
-        const activeTags = [...at].filter(t => t !== favTagKey);
-        const matchesTags = activeTags.length === 0 || activeTags.every(t => x.tags.includes(t));
-        
-        return matchesTags;
+    const createButton = (text, tag, isActive, onClick) => {
+        const button = document.createElement('button');
+        button.textContent = text;
+        if (tag) button.dataset.tag = tag;
+        if (isActive) button.classList.add('active');
+        button.onclick = onClick;
+        return button;
+    };
+
+    const allButton = createButton('All', null, activeTags.size === 0, () => {
+        activeTags.clear();
+        renderTags();
+        filterAndRenderGallery();
     });
-    rg(f)},
-us=()=>{if(!lb||!rb2||!tf)return;const{scrollWidth:sw,clientWidth:cw,scrollLeft:sl}=tf,is=sw>cw;if(!is){lb.classList.remove('visible');rb2.classList.remove('visible');return}lb.classList[sl>0?'add':'remove']('visible');rb2.classList[sl<sw-cw-1?'add':'remove']('visible')};
+    tagFiltersEl.appendChild(allButton);
 
-tf.addEventListener('mousedown',e=>{if(e.button!==0)return;iD=!0;tf.classList.add('grabbing');sX=e.pageX-tf.offsetLeft;sL=tf.scrollLeft});
-tf.addEventListener('mouseleave',()=>{iD=!1;tf.classList.remove('grabbing')});
-tf.addEventListener('mouseup',()=>{iD=!1;tf.classList.remove('grabbing')});
-tf.addEventListener('mousemove',e=>{if(!iD)return;e.preventDefault();const x=e.pageX-tf.offsetLeft;tf.scrollLeft=sL-(x-sX)*1.5});
+    const favButton = createButton('Favorites', favTagKey, activeTags.has(favTagKey), () => {
+        const wasActive = activeTags.has(favTagKey);
+        activeTags.clear();
+        if (!wasActive) activeTags.add(favTagKey);
+        renderTags();
+        filterAndRenderGallery();
+    });
+    tagFiltersEl.appendChild(favButton);
 
-si.addEventListener('input',fr);
-rb.onclick=()=>window.websim?.postComment?.({content:'\n'});
-lb.onclick=()=>tf.scrollBy({left:-tf.clientWidth*.8,behavior:'smooth'});
-rb2.onclick=()=>tf.scrollBy({left:tf.clientWidth*.8,behavior:'smooth'});
-tf.addEventListener('scroll',us,{passive:!0});
-window.addEventListener('resize',us);
+    allTags.forEach(tag => {
+        const button = createButton(tag, tag, activeTags.has(tag) && !activeTags.has(favTagKey), () => {
+            if (activeTags.has(favTagKey)) activeTags.delete(favTagKey);
+            activeTags.has(tag) ? activeTags.delete(tag) : activeTags.add(tag);
+            if (activeTags.has(tag)) addRecentTag(tag);
+            renderTags();
+            filterAndRenderGallery();
+        });
+        tagFiltersEl.appendChild(button);
+    });
 
-document.addEventListener('DOMContentLoaded', async ()=>{
-    await getCurrentUser(); // Ensure username is loaded early
-    setupSubscriptions(); // Start listening to database changes
-    rt(); // Render tags initially (handleAllFavoritesUpdate will call fr/rt again when data arrives)
-});
+    updateScrollButtons();
+};
+
+const filterAndRenderGallery = () => {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const favTagKey = '_favorites_';
+    const favoritesFilterActive = activeTags.has(favTagKey);
+
+    const filteredData = d.filter(item => {
+        const assetIdString = item.id.toString();
+        
+        const matchesSearch = !searchTerm || item.name.toLowerCase().includes(searchTerm) || item.tags.some(t => t.toLowerCase().includes(searchTerm));
+        if (!matchesSearch) return false;
+
+        if (favoritesFilterActive) return isFavoritedByCurrentUser(assetIdString);
+        
+        const regularActiveTags = [...activeTags].filter(t => t !== favTagKey);
+        return regularActiveTags.length === 0 || regularActiveTags.every(t => item.tags.includes(t));
+    });
+
+    renderGallery(filteredData);
+};
+
+
+// --- Event Handlers ---
+const handleMouseDown = e => { if(e.button !== 0) return; isDragging = true; tagFiltersEl.classList.add('grabbing'); startX = e.pageX - tagFiltersEl.offsetLeft; scrollLeft = tagFiltersEl.scrollLeft; };
+const handleMouseLeave = () => { isDragging = false; tagFiltersEl.classList.remove('grabbing'); };
+const handleMouseUp = () => { isDragging = false; tagFiltersEl.classList.remove('grabbing'); };
+const handleMouseMove = e => { if (!isDragging) return; e.preventDefault(); const x = e.pageX - tagFiltersEl.offsetLeft; tagFiltersEl.scrollLeft = scrollLeft - (x - startX) * 1.5; };
+const handleRequestAudio = () => window.websim?.postComment?.({ content: '\n' });
+const handleScrollLeft = () => tagFiltersEl.scrollBy({ left: -tagFiltersEl.clientWidth * 0.8, behavior: 'smooth' });
+const handleScrollRight = () => tagFiltersEl.scrollBy({ left: tagFiltersEl.clientWidth * 0.8, behavior: 'smooth' });
+
+// --- Initialization ---
+const init = async () => {
+    // Add event listeners
+    searchInput.addEventListener('input', filterAndRenderGallery);
+    requestAudioBtn.onclick = handleRequestAudio;
+    scrollLeftBtn.onclick = handleScrollLeft;
+    scrollRightBtn.onclick = handleScrollRight;
+    tagFiltersEl.addEventListener('scroll', updateScrollButtons, { passive: true });
+    window.addEventListener('resize', updateScrollButtons);
+    tagFiltersEl.addEventListener('mousedown', handleMouseDown);
+    tagFiltersEl.addEventListener('mouseleave', handleMouseLeave);
+    tagFiltersEl.addEventListener('mouseup', handleMouseUp);
+    tagFiltersEl.addEventListener('mousemove', handleMouseMove);
+
+    // Initial load
+    await getCurrentUser();
+    setupSubscriptions(); // Subscribes and triggers first data load via handleAllFavoritesUpdate
+    renderTags(); // Render tags, gallery will be rendered by the subscription callback
+};
+
+document.addEventListener('DOMContentLoaded', init);
+
+.play-button{width:44px;height:44px}.play-button svg{width:20px;height:20px}.audio-name{font-size:.8rem}
+
+@media(max-width:640px){#app-container{padding:.75rem}header{flex-direction:column;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}header h1{font-size:1.5rem}header p{font-size:.875rem;max-width:100%}#request-audio-btn{width:100%;padding:.85rem}.controls{margin-bottom:1.5rem}#search-input{font-size:.95rem}.tag-filters{gap:.4rem}.tag-filters button{padding:.4rem .8rem;font-size:.85rem}.gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}.audio-card{padding:.75rem;gap:.5rem;position:relative}
+.download-button{top:8px;left:8px;width:26px;height:26px}

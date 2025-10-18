@@ -17,7 +17,7 @@ const d=[
     {id:16,name:'Chest Open',src:'chest_open.mp3',tags:['game','collect','interaction','fx']},
     {id:17,name:'Water Splash',src:'water_splash.mp3',tags:['game','movement','environment','short']},
     {id:18,name:'Fast Whoosh',src:'whoosh_fast.mp3',tags:['game','movement','fx','short']},
-    {id:19,name:'Thunder Clap',src:'thunder_clap.mp3',tags:['game','environment','impact']},
+    {id:19,name:'Thunder Clap',src:'thunder_clap.mp3',tags:['game','environment','impact', 'weather']},
     {id:20,name:'Bow Shot',src:'bow_shot.mp3',tags:['game','weapon','fx','short']},
     {id:21,name:'Rope Rustle',src:'rope_rustle.mp3',tags:['game','interaction','ambient']},
     {id:22,name:'Power Down',src:'power_down.mp3',tags:['game','negative','fx']},
@@ -83,7 +83,10 @@ const d=[
     {id:82,name:'Flowing River Loop',src:'flowing_river_loop.mp3',tags:['nature','ambience','loop','environment']},
     {id:83,name:'Owl Hoot',src:'owl_hoot.mp3',tags:['nature','creature','short','ambient']},
     {id:84,name:'Strong Wind Howl',src:'strong_wind_howl.mp3',tags:['nature','environment','loop','weather']},
-    {id:85,name:'Gentle Rain Patter',src:'gentle_rain_patter.mp3',tags:['nature','ambience','loop','weather']}
+    {id:85,name:'Gentle Rain Patter',src:'gentle_rain_patter.mp3',tags:['nature','ambience','loop','weather']},
+    {id:86,name:'Heavy Downpour',src:'heavy_downpour.mp3',tags:['nature','ambience','loop','weather','environment']},
+    {id:87,name:'Blizzard Wind',src:'blizzard_wind.mp3',tags:['nature','environment','loop','weather','cold']},
+    {id:88,name:'Distant Thunderstorm',src:'distant_thunderstorm.mp3',tags:['nature','ambience','loop','weather','environment']}
 ];
 
 const room=new WebsimSocket;

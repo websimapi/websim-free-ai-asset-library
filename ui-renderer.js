@@ -156,7 +156,7 @@ export class UIRenderer {
         });
     }
 
-    renderTagFilters(activeTags, onTagClick, onAllClick, onFavoritesClick, onTTSClick, onImageClick, recentTags = [], showingFavorites, showingTTSOnly, showingImageOnly) {
+    renderTagFilters(activeTags, onTagClick, onAllClick, onFavoritesClick, onTopClick, onTTSClick, onImageClick, recentTags = [], showingFavorites, showingTopOnly, showingTTSOnly, showingImageOnly) {
         this.tagFilters.innerHTML = '';
 
         // All tags from audio library
@@ -176,7 +176,7 @@ export class UIRenderer {
         // All button
         const allBtn = document.createElement('button');
         allBtn.textContent = 'All';
-        if (activeTags.size === 0 && !showingFavorites && !showingTTSOnly && !showingImageOnly) {
+        if (activeTags.size === 0 && !showingFavorites && !showingTopOnly && !showingTTSOnly && !showingImageOnly) {
             allBtn.classList.add('active');
         }
         allBtn.onclick = onAllClick;
@@ -185,11 +185,22 @@ export class UIRenderer {
         // Favorites button
         const favBtn = document.createElement('button');
         favBtn.textContent = 'Favorites';
+        favBtn.dataset.filter = 'favorites';
         if (showingFavorites) {
             favBtn.classList.add('active');
         }
         favBtn.onclick = onFavoritesClick;
         this.tagFilters.appendChild(favBtn);
+        
+        // Top button (NEW)
+        const topBtn = document.createElement('button');
+        topBtn.textContent = 'Top';
+        topBtn.dataset.filter = 'top';
+        if (showingTopOnly) {
+            topBtn.classList.add('active');
+        }
+        topBtn.onclick = onTopClick;
+        this.tagFilters.appendChild(topBtn);
         
         // TTS button
         const ttsBtn = document.createElement('button');

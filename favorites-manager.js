@@ -92,4 +92,8 @@ export class FavoritesManager {
             throw error;
         }
     }
+    
+    getFavoriteCounts() {
+        return this.favoriteCounts;
+    }
 }

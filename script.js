@@ -34,7 +34,8 @@ const filterManager = new FilterManager(audioLibrary);
 function filterAndRender() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     const userFavs = favoritesManager.getUserFavorites();
-    const filtered = filterManager.filter(searchTerm, userFavs);
+    const favoriteCounts = favoritesManager.getFavoriteCounts();
+    const filtered = filterManager.filter(searchTerm, userFavs, favoriteCounts);
     
     uiRenderer.renderGallery(filtered);
     noResultsEl.classList[filtered.length ? 'add' : 'remove']('hidden');
@@ -92,7 +93,16 @@ function renderTags() {
         document.querySelectorAll('.tag-filters button').forEach(btn => 
             btn.classList.remove('active')
         );
-        document.querySelectorAll('.tag-filters button')[1].classList.add('active'); 
+        document.querySelector('.tag-filters button[data-filter="favorites"]').classList.add('active'); 
+        filterAndRender();
+    };
+    
+    const handleTopClick = () => {
+        filterManager.setTopMode();
+        document.querySelectorAll('.tag-filters button').forEach(btn =>
+            btn.classList.remove('active')
+        );
+        document.querySelector('.tag-filters button[data-filter="top"]').classList.add('active');
         filterAndRender();
     };
     
@@ -119,10 +129,12 @@ function renderTags() {
         handleTagClick,
         handleAllClick,
         handleFavoritesClick,
+        handleTopClick,
         handleTTSClick,
         handleImageClick,
         getRecentTags(),
         filterManager.showingFavorites,
+        filterManager.showingTopOnly,
         filterManager.showingTTSOnly,
         filterManager.showingImageOnly
     );

@@ -5,6 +5,7 @@ export class FilterManager {
         this.showingFavorites = false;
         this.showingTTSOnly = false;
         this.showingImageOnly = false;
+        this.showingTopOnly = false;
         this.combinedAudioLibrary = [...audioLibrary];
     }
 
@@ -13,7 +14,7 @@ export class FilterManager {
         this.combinedAudioLibrary = [...standardAudio, ...userAssets];
     }
 
-    filter(searchTerm, userFavorites) {
+    filter(searchTerm, userFavorites, favoriteCounts) {
         let filtered = this.combinedAudioLibrary;
 
         if (this.showingFavorites) {
@@ -32,12 +33,22 @@ export class FilterManager {
             const searchMatch = searchTerm === '' || nameMatch || tagMatch || ttsTextMatch || imagePromptMatch;
 
             let tagFilterMatch = true;
-            if (!this.showingFavorites && !this.showingTTSOnly && !this.showingImageOnly) {
+            if (!this.showingFavorites && !this.showingTTSOnly && !this.showingImageOnly && !this.showingTopOnly) {
                 tagFilterMatch = !this.activeTags.size || [...this.activeTags].every(t => asset.tags.includes(t));
             }
 
             return searchMatch && tagFilterMatch;
         });
+        
+        // Sorting by favorites if in Top mode
+        if (this.showingTopOnly && favoriteCounts) {
+            filtered.sort((a, b) => {
+                const countA = favoriteCounts[a.id] || 0;
+                const countB = favoriteCounts[b.id] || 0;
+                return countB - countA; // Descending order
+            });
+        }
+
 
         return filtered;
     }
@@ -46,6 +57,7 @@ export class FilterManager {
         this.showingFavorites = false;
         this.showingTTSOnly = false;
         this.showingImageOnly = false;
+        this.showingTopOnly = false;
         this.activeTags.clear();
         this.activeTags.add(tag);
     }
@@ -54,6 +66,7 @@ export class FilterManager {
         this.showingFavorites = false;
         this.showingTTSOnly = false;
         this.showingImageOnly = false;
+        this.showingTopOnly = false;
         this.activeTags.clear();
     }
 
@@ -62,6 +75,15 @@ export class FilterManager {
         this.showingFavorites = true;
         this.showingTTSOnly = false;
         this.showingImageOnly = false;
+        this.showingTopOnly = false;
+    }
+    
+    setTopMode() {
+        this.activeTags.clear();
+        this.showingFavorites = false;
+        this.showingTTSOnly = false;
+        this.showingImageOnly = false;
+        this.showingTopOnly = true;
     }
 
     setTTSMode() {
@@ -69,6 +91,7 @@ export class FilterManager {
         this.showingFavorites = false;
         this.showingTTSOnly = true;
         this.showingImageOnly = false;
+        this.showingTopOnly = false;
     }
 
     setImageMode() {
@@ -76,5 +99,6 @@ export class FilterManager {
         this.showingFavorites = false;
         this.showingTTSOnly = false;
         this.showingImageOnly = true;
+        this.showingTopOnly = false;
     }
 }

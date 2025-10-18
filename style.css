@@ -27,8 +27,11 @@ header p{color:var(--text-muted-color);font-size:.9rem;max-width:400px}
 #scroll-left-btn svg,#scroll-right-btn svg{width:20px;height:20px}
 @media(hover:hover)and (min-width:769px){.scroll-btn{display:inline-flex}.tag-filters-wrapper{-webkit-mask-image:linear-gradient(to right,transparent,black 40px,black calc(100% - 40px),transparent);mask-image:linear-gradient(to right,transparent,black 40px,black calc(100% - 40px),transparent)}}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem}
-.audio-card{background-color:var(--surface-color);border-radius:8px;padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.75rem;border:1px solid transparent;transition:border-color .2s ease}
+.audio-card{background-color:var(--surface-color);border-radius:8px;padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.75rem;border:1px solid transparent;transition:border-color .2s ease;position:relative}
 .audio-card:hover{border-color:var(--border-color)}
+.download-button{position:absolute;top:10px;left:10px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--text-color);background-color:rgba(0,0,0,.4);border-radius:50%;transition:background-color .2s ease;text-decoration:none;z-index:5}
+.download-button:hover{background-color:var(--primary-color)}
+.download-button svg{width:16px;height:16px}
 .play-button{width:50px;height:50px;border-radius:50%;background-color:var(--primary-color);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .2s ease;flex-shrink:0}
 .play-button:hover{background-color:var(--primary-hover-color)}
 .play-button svg{fill:white;width:24px;height:24px;transition:transform .1s ease}
@@ -36,5 +39,8 @@ header p{color:var(--text-muted-color);font-size:.9rem;max-width:400px}
 .audio-name{font-size:.9rem;font-weight:400;color:var(--text-color)}
 #no-results{text-align:center;color:var(--text-muted-color);padding:2rem}
 .hidden{display:none}
-@media(max-width:640px){#app-container{padding:.75rem}header{flex-direction:column;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}header h1{font-size:1.5rem}header p{font-size:.875rem;max-width:100%}#request-audio-btn{width:100%;padding:.85rem}.controls{margin-bottom:1.5rem}#search-input{font-size:.95rem}.tag-filters{gap:.4rem}.tag-filters button{padding:.4rem .8rem;font-size:.85rem}.gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}.audio-card{padding:.75rem;gap:.5rem}.play-button{width:44px;height:44px}.play-button svg{width:20px;height:20px}.audio-name{font-size:.8rem}}
+@media(max-width:640px){#app-container{padding:.75rem}header{flex-direction:column;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}header h1{font-size:1.5rem}header p{font-size:.875rem;max-width:100%}#request-audio-btn{width:100%;padding:.85rem}.controls{margin-bottom:1.5rem}#search-input{font-size:.95rem}.tag-filters{gap:.4rem}.tag-filters button{padding:.4rem .8rem;font-size:.85rem}.gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}.audio-card{padding:.75rem;gap:.5rem;position:relative}
+.download-button{top:8px;left:8px;width:26px;height:26px}
+.download-button svg{width:14px;height:14px}
+.play-button{width:44px;height:44px}.play-button svg{width:20px;height:20px}.audio-name{font-size:.8rem}}
 

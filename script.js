@@ -51,7 +51,21 @@ ar=t=>{let r=gr().filter(x=>x!==t);r.unshift(t);sr(r)},
 ia=()=>{ac||(ac=new(window.AudioContext||window.webkitAudioContext)())},
 la=async u=>{if(ab.has(u))return ab.get(u);try{const r=await fetch(u),a=await r.arrayBuffer(),b=await ac.decodeAudioData(a);ab.set(u,b);return b}catch(e){console.error(`Error loading ${u}:`,e)}},
 ps=(b,btn)=>{if(!ac)return;cp?.source?.stop();cp?.button?.classList.remove('playing');const s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);btn.classList.add('playing');s.onended=()=>{btn.classList.remove('playing');cp?.source===s&&(cp=null)};cp={source:s,button:btn}},
-rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(x=>{const c=document.createElement('div');c.className='audio-card';const b=document.createElement('button');b.className='play-button';b.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5v14l11-7z"></path></svg>';b.onclick=async()=>{ia();const bf=await la(x.src);bf&&ps(bf,b)};const n=document.createElement('div');n.className='audio-name';n.textContent=x.name;c.append(b,n);g.appendChild(c)})},
+rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(x=>{
+    const c=document.createElement('div');
+    c.className='audio-card';
+    const dl=document.createElement('a');
+    dl.href=x.src;
+    dl.download=x.name.replace(/ /g, '_')+'.mp3';
+    dl.className='download-button';
+    dl.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+    const b=document.createElement('button');
+    b.className='play-button';
+    b.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5v14l11-7z"></path></svg>';
+    b.onclick=async()=>{ia();const bf=await la(x.src);bf&&ps(bf,b)};
+    const n=document.createElement('div');n.className='audio-name';n.textContent=x.name;
+    c.append(dl,b,n);
+    g.appendChild(c)})},
 rt=()=>{const a=[...new Set(d.flatMap(x=>x.tags))],r=gr();a.sort((x,y)=>{const ix=r.indexOf(x),iy=r.indexOf(y);return ix!==-1&&iy!==-1?ix-iy:ix!==-1?-1:iy!==-1?1:x.localeCompare(y)});tf.innerHTML='';const ab=document.createElement('button');ab.textContent='All';ab.classList.add('active');ab.onclick=()=>{at.clear();document.querySelectorAll('.tag-filters button').forEach(b=>b.classList.remove('active'));ab.classList.add('active');fr()};tf.appendChild(ab);a.forEach(t=>{const b=document.createElement('button');b.textContent=t;b.dataset.tag=t;b.onclick=()=>{document.querySelector('.tag-filters button').classList.remove('active');b.classList.toggle('active');at.has(t)?at.delete(t):(at.add(t),ar(t));!at.size&&ab.classList.add('active');fr()};tf.appendChild(b)});us()},
 fr=()=>{const s=si.value.toLowerCase().trim(),f=d.filter(x=>{const nm=x.name.toLowerCase().includes(s),tm=x.tags.some(t=>t.toLowerCase().includes(s)),sm=nm||tm,am=!at.size||[...at].every(t=>x.tags.includes(t));return sm&&am});rg(f)},
 us=()=>{if(!lb||!rb2||!tf)return;const{scrollWidth:sw,clientWidth:cw,scrollLeft:sl}=tf,is=sw>cw;if(!is){lb.classList.remove('visible');rb2.classList.remove('visible');return}lb.classList[sl>0?'add':'remove']('visible');rb2.classList[sl<sw-cw-1?'add':'remove']('visible')};

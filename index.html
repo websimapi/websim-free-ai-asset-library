@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="cover-overlay" class="cover-overlay">
+        <img src="/asset_cover.png" alt="Free Audio cover" class="cover-image" />
+    </div>
+
     <div id="app-container">
         <header>
             <div class="header-content">
@@ -60,6 +64,25 @@
             <p id="no-results" class="hidden">No sounds found. Try a different search or filter.</p>
         </main>
     </div>
+
+    <script>
+    (function(){
+        const overlay = document.getElementById('cover-overlay');
+        // If running under webdriver/automation, keep overlay visible (no fade)
+        const isWebDriver = !!navigator.webdriver;
+        if (!overlay) return;
+        if (isWebDriver) {
+            // leave visible (do nothing) so webdriver can capture it
+            overlay.classList.add('persist');
+            return;
+        }
+        // Normal users: fade after 3 seconds
+        setTimeout(() => {
+            overlay.classList.add('fade-out');
+            overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+        }, 3000);
+    })();
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js" crossorigin="anonymous"></script>

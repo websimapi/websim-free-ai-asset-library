@@ -91,12 +91,12 @@ const room=new WebsimSocket;
 const g=document.getElementById('gallery'),
 si=document.getElementById('search-input'),
 tf=document.getElementById('tag-filters'),
-rb=document.getElementById('request-audio-btn'),
+rb=document.getElementById('scroll-right-btn'),
 nr=document.getElementById('no-results'),
 lb=document.getElementById('scroll-left-btn'),
 rb2=document.getElementById('scroll-right-btn');
 
-let ac,ab=new Map(),at=new Set(),cp=null,k='audioFilterUsage',iD=!1,sX,sL,currentUser,userFavoritesRecord=null,favoriteCounts={},showingFavorites=!1, allFavorites = [];
+let ac,ab=new Map(),at=new Set(),cp=null,k='audioFilterUsage',iD=!1,sX,sL,currentUser,userFavoritesRecord=null,favoriteCounts={},showingFavorites=!1;
 
 const gr=()=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}},
 sr=t=>{try{localStorage.setItem(k,JSON.stringify(t))}catch(e){}},
@@ -104,7 +104,7 @@ ar=t=>{let r=gr().filter(x=>x!==t);r.unshift(t);sr(r)},
 ia=()=>{ac||(ac=new(window.AudioContext||window.webkitAudioContext)())},
 la=async u=>{if(ab.has(u))return ab.get(u);try{const r=await fetch(u),a=await r.arrayBuffer(),b=await ac.decodeAudioData(a);ab.set(u,b);return b}catch(e){console.error(`Error loading ${u}:`,e)}},
 ps=(b,btn)=>{if(!ac)return;cp?.source?.stop();cp?.button?.classList.remove('playing');const s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);btn.classList.add('playing');s.onended=()=>{btn.classList.remove('playing');cp?.source===s&&(cp=null)};cp={source:s,button:btn}},
-handleFavoriteClick=async audioId=>{if(!currentUser)return;const currentFavs=userFavoritesRecord?.favorites||[],isFavorited=currentFavs.includes(audioId),newFavs=isFavorited?currentFavs.filter(id=>id!==audioId):[...currentFavs,audioId];const optimisticRecord={...userFavoritesRecord,favorites:newFavs};if(!userFavoritesRecord)optimisticRecord.username=currentUser.username;const optimisticData=allFavorites.filter(r=>r.username!==currentUser.username).concat([optimisticRecord]);processFavoritesData(optimisticData);fr();try{userFavoritesRecord?await room.collection('user_favorites_v1').update(userFavoritesRecord.id,{favorites:newFavs}):await room.collection('user_favorites_v1').create({favorites:newFavs})}catch(e){console.error('Failed to update favorites:',e)}},
+handleFavoriteClick=async(audioId,button)=>{if(!currentUser||button.disabled)return;button.disabled=!0;button.style.opacity='0.5';const currentFavs=userFavoritesRecord?.favorites||[],isFavorited=currentFavs.includes(audioId),newFavs=isFavorited?currentFavs.filter(id=>id!==audioId):[...currentFavs,audioId];try{if(userFavoritesRecord){await room.collection('user_favorites_v1').update(userFavoritesRecord.id,{favorites:newFavs})}else{await room.collection('user_favorites_v1').create({favorites:newFavs})}}catch(e){console.error('Failed to update favorites:',e)}finally{button.disabled=!1;button.style.opacity='1'}},
 rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(x=>{
     const c=document.createElement('div');
     c.className='audio-card';
@@ -119,7 +119,7 @@ rg=i=>{g.innerHTML='';nr.classList[i.length?'add':'remove']('hidden');i.forEach(
     const favButton = document.createElement('button');
     favButton.className = 'favorite-button';
     favButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>`;
-    favButton.onclick = () => handleFavoriteClick(x.id);
+    favButton.onclick = () => handleFavoriteClick(x.id, favButton);
     const isFavorited = userFavoritesRecord?.favorites?.includes(x.id);
     if(isFavorited) favButton.classList.add('active');
 
@@ -152,12 +152,11 @@ tf.addEventListener('scroll',us,{passive:!0});
 window.addEventListener('resize',us);
 
 const processFavoritesData = records => {
-    allFavorites = records;
     if (currentUser) {
-        userFavoritesRecord = allFavorites.find(r => r.username === currentUser.username) || null;
+        userFavoritesRecord = records.find(r => r.username === currentUser.username) || null;
     }
     const counts = {};
-    allFavorites.forEach(record => {
+    records.forEach(record => {
         record.favorites?.forEach(audioId => {
             counts[audioId] = (counts[audioId] || 0) + 1;
         });

@@ -130,8 +130,10 @@ const loadAudio = async (url) => {
 };
 const playSound = (buffer, button) => {
     if (!audioContext) return;
-    currentPlayback?.source?.stop();
-    currentPlayback?.button?.classList.remove('playing');
+    if (currentPlayback) {
+        currentPlayback.source?.stop();
+        currentPlayback.button?.classList.remove('playing');
+    }
     const source = audioContext.createBufferSource();
     source.buffer = buffer;
     source.connect(audioContext.destination);
@@ -375,8 +377,3 @@ const init = async () => {
 };
 
 document.addEventListener('DOMContentLoaded', init);
-
-.play-button{width:44px;height:44px}.play-button svg{width:20px;height:20px}.audio-name{font-size:.8rem}
-
-@media(max-width:640px){#app-container{padding:.75rem}header{flex-direction:column;align-items:flex-start;gap:1rem;margin-bottom:1.5rem}header h1{font-size:1.5rem}header p{font-size:.875rem;max-width:100%}#request-audio-btn{width:100%;padding:.85rem}.controls{margin-bottom:1.5rem}#search-input{font-size:.95rem}.tag-filters{gap:.4rem}.tag-filters button{padding:.4rem .8rem;font-size:.85rem}.gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}.audio-card{padding:.75rem;gap:.5rem;position:relative}
-.download-button{top:8px;left:8px;width:26px;height:26px}

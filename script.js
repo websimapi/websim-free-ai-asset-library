@@ -37,7 +37,12 @@ const d=[
     {id:36,name:'Winch Crank',src:'winch_crank.mp3',tags:['mechanism','interaction','fx']},
     {id:37,name:'Poison Debuff',src:'poison_debuff.mp3',tags:['magic','negative','fx','status']},
     {id:38,name:'Item Equip',src:'item_equip.mp3',tags:['ui','inventory','interaction']},
-    {id:39,name:'Victory Fanfare',src:'victory_fanfare.mp3',tags:['game','positive','ui','reward']}
+    {id:39,name:'Victory Fanfare',src:'victory_fanfare.mp3',tags:['game','positive','ui','reward']},
+    {id:40,name:'Portal Open',src:'portal_open.mp3',tags:['magic','teleport','fx']},
+    {id:41,name:'Critical Hit',src:'critical_hit.mp3',tags:['weapon','impact','game','short']},
+    {id:42,name:'Quest Update',src:'quest_update.mp3',tags:['ui','notification','positive']},
+    {id:43,name:'Heavy Panting',src:'heavy_panting.mp3',tags:['character','movement','loop','negative']},
+    {id:44,name:'Gear Grind',src:'gear_grind.mp3',tags:['mechanism','interaction','fx']}
 ];
 
 const g=document.getElementById('gallery'),

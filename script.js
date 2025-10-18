@@ -95,7 +95,10 @@ const d=[
     {id:94,name:'Stealth Field Activate',src:'stealth_field_activate.mp3',tags:['sci-fi','electronic','stealth','fx']},
     {id:95,name:'Inventory Sort',src:'inventory_sort.mp3',tags:['ui','inventory','interaction','short']},
     {id:96,name:'Loot Container Open',src:'loot_container_open.mp3',tags:['game','inventory','interaction','fx']},
-    {id:97,name:'Potion Consume',src:'potion_consume.mp3',tags:['game','inventory','health','fx']}
+    {id:97,name:'Potion Consume',src:'potion_consume.mp3',tags:['game','inventory','health','fx']},
+    {id:98,name:'System Notification',src:'system_notification.mp3',tags:['ui', 'notification', 'electronic', 'short']},
+    {id:99,name:'Critical Alert',src:'critical_alert.mp3',tags:['ui', 'notification', 'negative', 'alert']},
+    {id:100,name:'Success Chime',src:'success_chime.mp3',tags:['ui', 'notification', 'positive', 'reward', 'short']}
 ];
 
 const room=new WebsimSocket;

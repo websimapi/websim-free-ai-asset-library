@@ -68,7 +68,11 @@ const d=[
     {id:67,name:'Armor Shatter',src:'armor_shatter.mp3',tags:['armor', 'negative', 'impact', 'fx']},
     {id:68,name:'Dagger Stab',src:'dagger_stab.mp3',tags:['weapon', 'impact', 'damage', 'short', 'fx']},
     {id:69,name:'Acid Burn',src:'acid_burn.mp3',tags:['magic', 'damage', 'status', 'negative', 'fx']},
-    {id:70,name:'Crushing Blow',src:'crushing_blow.mp3',tags:['weapon', 'impact', 'damage', 'heavy', 'fx']}
+    {id:70,name:'Crushing Blow',src:'crushing_blow.mp3',tags:['weapon', 'impact', 'damage', 'heavy', 'fx']},
+    {id:71,name:'System Boot',src:'system_boot.mp3',tags:['electronic', 'sci-fi', 'positive', 'fx']},
+    {id:72,name:'Holographic UI Tap',src:'holographic_ui_tap.mp3',tags:['electronic', 'ui', 'sci-fi', 'short']},
+    {id:73,name:'Data Transfer Loop',src:'data_transfer_loop.mp3',tags:['electronic', 'sci-fi', 'loop', 'ambience']},
+    {id:74,name:'Electronic Lock',src:'electronic_lock.mp3',tags:['electronic', 'mechanism', 'sci-fi', 'fx']}
 ];
 
 const g=document.getElementById('gallery'),

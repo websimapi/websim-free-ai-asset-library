@@ -82,7 +82,8 @@ export class FavoritesManager {
             } else {
                 const newRecord = await this.room.collection('user_data_v2').create({
                     favorites: newFavs,
-                    tts_assets: {}
+                    tts_assets: {},
+                    image_assets: {} // Initialize image assets column
                 });
                 this.userFavoritesRecord = newRecord;
             }

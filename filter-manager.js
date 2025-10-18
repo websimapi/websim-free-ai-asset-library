@@ -1,0 +1,80 @@
+export class FilterManager {
+    constructor(audioLibrary) {
+        this.audioLibrary = audioLibrary;
+        this.activeTags = new Set();
+        this.showingFavorites = false;
+        this.showingTTSOnly = false;
+        this.showingImageOnly = false;
+        this.combinedAudioLibrary = [...audioLibrary];
+    }
+
+    updateCombinedLibrary(userAssets) {
+        const standardAudio = this.audioLibrary.map(a => ({...a, asset_type: 'audio'}));
+        this.combinedAudioLibrary = [...standardAudio, ...userAssets];
+    }
+
+    filter(searchTerm, userFavorites) {
+        let filtered = this.combinedAudioLibrary;
+
+        if (this.showingFavorites) {
+            filtered = filtered.filter(asset => userFavorites[asset.id]);
+        } else if (this.showingTTSOnly) {
+            filtered = filtered.filter(asset => asset.asset_type === 'audio' && asset.tags.includes('tts'));
+        } else if (this.showingImageOnly) {
+            filtered = filtered.filter(asset => asset.asset_type === 'image');
+        }
+
+        filtered = filtered.filter(asset => {
+            const nameMatch = asset.name.toLowerCase().includes(searchTerm);
+            const tagMatch = asset.tags.some(t => t.toLowerCase().includes(searchTerm));
+            const ttsTextMatch = asset.asset_type === 'audio' && asset.text ? asset.text.toLowerCase().includes(searchTerm) : false;
+            const imagePromptMatch = asset.asset_type === 'image' && asset.prompt ? asset.prompt.toLowerCase().includes(searchTerm) : false;
+            const searchMatch = searchTerm === '' || nameMatch || tagMatch || ttsTextMatch || imagePromptMatch;
+
+            let tagFilterMatch = true;
+            if (!this.showingFavorites && !this.showingTTSOnly && !this.showingImageOnly) {
+                tagFilterMatch = !this.activeTags.size || [...this.activeTags].every(t => asset.tags.includes(t));
+            }
+
+            return searchMatch && tagFilterMatch;
+        });
+
+        return filtered;
+    }
+
+    setTagActive(tag) {
+        this.showingFavorites = false;
+        this.showingTTSOnly = false;
+        this.showingImageOnly = false;
+        this.activeTags.clear();
+        this.activeTags.add(tag);
+    }
+
+    clearFilters() {
+        this.showingFavorites = false;
+        this.showingTTSOnly = false;
+        this.showingImageOnly = false;
+        this.activeTags.clear();
+    }
+
+    setFavoritesMode() {
+        this.activeTags.clear();
+        this.showingFavorites = true;
+        this.showingTTSOnly = false;
+        this.showingImageOnly = false;
+    }
+
+    setTTSMode() {
+        this.activeTags.clear();
+        this.showingFavorites = false;
+        this.showingTTSOnly = true;
+        this.showingImageOnly = false;
+    }
+
+    setImageMode() {
+        this.activeTags.clear();
+        this.showingFavorites = false;
+        this.showingTTSOnly = false;
+        this.showingImageOnly = true;
+    }
+}

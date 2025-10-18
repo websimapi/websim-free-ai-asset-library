@@ -3,6 +3,9 @@ import { AudioPlayer } from './audio-player.js';
 import { FavoritesManager } from './favorites-manager.js';
 import { UIRenderer } from './ui-renderer.js';
 import { getRecentTags, addRecentTag } from './tag-storage.js';
+import { TTSGenerator } from './tts-generator.js';
+import { ImageGenerator } from './image-generator.js';
+import { FilterManager } from './filter-manager.js';
 
 const room = new WebsimSocket();
 
@@ -14,17 +17,8 @@ const noResultsEl = document.getElementById('no-results');
 const scrollLeftBtn = document.getElementById('scroll-left-btn');
 const scrollRightBtn = document.getElementById('scroll-right-btn');
 const requestAudioBtn = document.getElementById('request-audio-btn');
-const generateTtsBtn = document.getElementById('generate-tts-btn');
-const ttsGenerator = document.getElementById('tts-generator');
-const ttsTextInput = document.getElementById('tts-text');
-const ttsVoiceSelect = document.getElementById('tts-voice');
-const ttsSubmitBtn = document.getElementById('generate-tts-submit');
 
-// State
-let combinedAudioLibrary = [...audioLibrary];
-let activeTags = new Set();
-let showingFavorites = false;
-let showingTTSOnly = false;
+// State for tag scrolling
 let isDragging = false;
 let startX, scrollLeft;
 
@@ -32,33 +26,16 @@ let startX, scrollLeft;
 const audioPlayer = new AudioPlayer();
 const favoritesManager = new FavoritesManager(room);
 const uiRenderer = new UIRenderer(gallery, tagFiltersContainer, audioPlayer, favoritesManager);
+const ttsGenerator = new TTSGenerator(room);
+const imageGenerator = new ImageGenerator(room);
+const filterManager = new FilterManager(audioLibrary);
 
 // Filter and render
 function filterAndRender() {
     const searchTerm = searchInput.value.toLowerCase().trim();
-    let filtered = combinedAudioLibrary;
-
-    // Filter by favorites or TTS
-    if (showingFavorites) {
-        const userFavs = favoritesManager.getUserFavorites();
-        filtered = filtered.filter(audio => userFavs[audio.id]);
-    } else if (showingTTSOnly) {
-        filtered = filtered.filter(audio => audio.tags.includes('tts'));
-    }
-
-    // Filter by search and tags
-    filtered = filtered.filter(audio => {
-        const nameMatch = audio.name.toLowerCase().includes(searchTerm);
-        const tagMatch = audio.tags.some(t => t.toLowerCase().includes(searchTerm));
-        
-        // Check if audio has a 'text' property (TTS items) for full text search
-        const ttsTextMatch = audio.text ? audio.text.toLowerCase().includes(searchTerm) : false;
-
-        const searchMatch = searchTerm === '' || nameMatch || tagMatch || ttsTextMatch;
-        const tagFilterMatch = !activeTags.size || [...activeTags].every(t => audio.tags.includes(t));
-        return searchMatch && tagFilterMatch;
-    });
-
+    const userFavs = favoritesManager.getUserFavorites();
+    const filtered = filterManager.filter(searchTerm, userFavs);
+    
     uiRenderer.renderGallery(filtered);
     noResultsEl.classList[filtered.length ? 'add' : 'remove']('hidden');
 }
@@ -83,32 +60,26 @@ function updateScrollButtons() {
 // Render tag filters
 function renderTags() {
     const handleTagClick = (tag, button) => {
-        showingFavorites = false;
-        showingTTSOnly = false;
         const wasActive = button.classList.contains('active');
         
-        // Clear all active states
         document.querySelectorAll('.tag-filters button').forEach(btn => 
             btn.classList.remove('active')
         );
-        activeTags.clear();
         
         if (!wasActive) {
             button.classList.add('active');
-            activeTags.add(tag);
+            filterManager.setTagActive(tag);
             addRecentTag(tag);
         } else {
-            // If deactivating, show all
             document.querySelector('.tag-filters button').classList.add('active');
+            filterManager.clearFilters();
         }
         
         filterAndRender();
     };
 
     const handleAllClick = () => {
-        showingFavorites = false;
-        showingTTSOnly = false;
-        activeTags.clear();
+        filterManager.clearFilters();
         document.querySelectorAll('.tag-filters button').forEach(btn => 
             btn.classList.remove('active')
         );
@@ -117,36 +88,43 @@ function renderTags() {
     };
 
     const handleFavoritesClick = () => {
-        activeTags.clear();
-        showingFavorites = true;
-        showingTTSOnly = false;
+        filterManager.setFavoritesMode();
         document.querySelectorAll('.tag-filters button').forEach(btn => 
             btn.classList.remove('active')
         );
-        document.querySelectorAll('.tag-filters button')[1].classList.add('active');
+        document.querySelectorAll('.tag-filters button')[1].classList.add('active'); 
         filterAndRender();
     };
     
     const handleTTSClick = () => {
-        activeTags.clear();
-        showingFavorites = false;
-        showingTTSOnly = true;
+        filterManager.setTTSMode();
         document.querySelectorAll('.tag-filters button').forEach(btn =>
             btn.classList.remove('active')
         );
         document.querySelector('.tag-filters button[data-filter="tts"]').classList.add('active');
         filterAndRender();
     };
+    
+    const handleImageClick = () => {
+        filterManager.setImageMode();
+        document.querySelectorAll('.tag-filters button').forEach(btn =>
+            btn.classList.remove('active')
+        );
+        document.querySelector('.tag-filters button[data-filter="image"]').classList.add('active');
+        filterAndRender();
+    };
 
     uiRenderer.renderTagFilters(
-        activeTags,
+        filterManager.activeTags,
         handleTagClick,
         handleAllClick,
         handleFavoritesClick,
         handleTTSClick,
+        handleImageClick,
         getRecentTags(),
-        showingFavorites,
-        showingTTSOnly
+        filterManager.showingFavorites,
+        filterManager.showingTTSOnly,
+        filterManager.showingImageOnly
     );
     
     updateScrollButtons();
@@ -178,106 +156,20 @@ tagFiltersContainer.addEventListener('mousemove', e => {
     tagFiltersContainer.scrollLeft = scrollLeft - (x - startX) * 1.5;
 });
 
-// TTS Section Logic
-const voices = [
-    { value: "en-male", text: "English - Male" },
-    { value: "en-female", text: "English - Female" },
-    { value: "es-male", text: "Spanish - Male" },
-    { value: "es-female", text: "Spanish - Female" },
-    { value: "fr-male", text: "French - Male" },
-    { value: "fr-female", text: "French - Female" },
-    { value: "de-male", text: "German - Male" },
-    { value: "de-female", text: "German - Female" },
-    { value: "it-male", text: "Italian - Male" },
-    { value: "it-female", text: "Italian - Female" },
-    { value: "pt-male", text: "Portuguese - Male" },
-    { value: "pt-female", text: "Portuguese - Female" },
-    { value: "ru-male", text: "Russian - Male" },
-    { value: "ru-female", text: "Russian - Female" },
-];
-
-function populateVoices() {
-    ttsVoiceSelect.innerHTML = '';
-    voices.forEach(voice => {
-        const option = document.createElement('option');
-        option.value = voice.value;
-        option.textContent = voice.text;
-        ttsVoiceSelect.appendChild(option);
-    });
-}
-
-function setTtsButtonLoading(isLoading) {
-    const btnText = ttsSubmitBtn.querySelector('.btn-text');
-    const loader = ttsSubmitBtn.querySelector('.loader');
-    ttsSubmitBtn.disabled = isLoading;
-    if (isLoading) {
-        btnText.classList.add('hidden');
-        loader.classList.remove('hidden');
-    } else {
-        btnText.classList.remove('hidden');
-        loader.classList.add('hidden');
-    }
-}
-
-async function handleTtsSubmit() {
-    const text = ttsTextInput.value.trim();
-    if (!text) {
-        alert("Please enter some text.");
-        return;
-    }
-    setTtsButtonLoading(true);
-    try {
-        const result = await websim.textToSpeech({
-            text,
-            voice: ttsVoiceSelect.value,
-        });
-
-        const currentUser = await window.websim.getCurrentUser();
-        // Note: getList() might not be instantly consistent after create/update,
-        // but it's the most straightforward way to find the user's record here.
-        // A more robust solution might involve caching userRecord in a state variable.
-        const userRecords = room.collection('user_data_v2').getList();
-        const userRecord = userRecords.find(r => r.username === currentUser.username);
-        
-        const newTtsId = 'tts_' + Date.now() + Math.random().toString(36).substring(2, 9);
-        const newTtsAsset = {
-            name: `TTS: ${text.substring(0, 20)}${text.length > 20 ? '...' : ''}`,
-            src: result.url,
-            text,
-            voice: ttsVoiceSelect.value,
-            tags: ['tts', 'user-generated']
-        };
-
-        if (userRecord) {
-            const newTtsAssets = { ...(userRecord.tts_assets || {}), [newTtsId]: newTtsAsset };
-            await room.collection('user_data_v2').update(userRecord.id, { tts_assets: newTtsAssets });
-        } else {
-            await room.collection('user_data_v2').create({
-                tts_assets: { [newTtsId]: newTtsAsset },
-                favorites: {}
-            });
-        }
-        
-        ttsTextInput.value = '';
-        ttsGenerator.classList.add('hidden');
-        generateTtsBtn.classList.remove('active');
-
-    } catch (error) {
-        console.error("Failed to generate TTS:", error);
-        alert("Sorry, there was an error generating the audio.");
-    } finally {
-        setTtsButtonLoading(false);
-    }
-}
-
-generateTtsBtn.onclick = () => {
-    ttsGenerator.classList.toggle('hidden');
-    generateTtsBtn.classList.toggle('active');
-    if (!ttsGenerator.classList.contains('hidden')) {
-        populateVoices();
-    }
+// UI Toggle handlers
+document.getElementById('generate-tts-btn').onclick = () => {
+    imageGenerator.close();
+    ttsGenerator.toggle();
 };
-ttsSubmitBtn.onclick = handleTtsSubmit;
+
+document.getElementById('generate-image-btn').onclick = () => {
+    ttsGenerator.close();
+    imageGenerator.toggle();
+};
+
+// Submit handlers
+document.getElementById('generate-tts-submit').onclick = () => ttsGenerator.submit();
+document.getElementById('generate-image-submit').onclick = () => imageGenerator.submit();
 
 // Event listeners
 searchInput.addEventListener('input', filterAndRender);
@@ -299,32 +191,42 @@ async function initApp() {
 
     room.collection('user_data_v2').subscribe(userRecords => {
         const allTtsAssets = [];
+        const allImageAssets = [];
+        
         userRecords.forEach(record => {
             if (record.tts_assets) {
                 Object.entries(record.tts_assets).forEach(([id, ttsData]) => {
                     allTtsAssets.push({
                         ...ttsData,
                         id: id,
+                        asset_type: 'audio'
+                    });
+                });
+            }
+            if (record.image_assets) {
+                Object.entries(record.image_assets).forEach(([id, imageData]) => {
+                    allImageAssets.push({
+                        ...imageData,
+                        id: id,
+                        asset_type: 'image'
                     });
                 });
             }
         });
         
-        // Sort TTS assets by ID (which includes a timestamp) to show newest first
         allTtsAssets.sort((a, b) => b.id.localeCompare(a.id));
+        allImageAssets.sort((a, b) => b.id.localeCompare(a.id));
+
+        filterManager.updateCombinedLibrary([...allTtsAssets, ...allImageAssets]);
         
-        combinedAudioLibrary = [...audioLibrary, ...allTtsAssets];
-        
-        // Re-render if the gallery is visible
-        if (document.querySelector('.audio-card')) {
-             filterAndRender();
+        if (gallery.children.length > 0 || allTtsAssets.length > 0 || allImageAssets.length > 0) {
+            filterAndRender();
         }
         renderTags();
     });
     
-    // Re-render when favorites update
     favoritesManager.onUpdate(() => {
-        if (document.querySelector('.audio-card')) {
+        if (gallery.children.length > 0) {
             filterAndRender();
         }
     });

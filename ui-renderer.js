@@ -11,9 +11,9 @@ export class UIRenderer {
     renderGallery(audioItems) {
         this.gallery.innerHTML = '';
         
-        audioItems.forEach(audio => {
+        audioItems.forEach(asset => {
             const card = document.createElement('div');
-            card.className = 'audio-card';
+            card.className = asset.asset_type === 'image' ? 'image-card' : 'audio-card';
             
             // Download button
             const downloadButton = document.createElement('button');
@@ -27,21 +27,66 @@ export class UIRenderer {
                 downloadButton.style.opacity = '0.5';
 
                 try {
-                    const response = await fetch(audio.src);
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = audio.name.replace(/ /g, '_') + '.mp3';
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    a.remove();
+                    const extension = asset.asset_type === 'image' ? '.png' : '.mp3';
+                    const sanitizedName = (asset.name || 'download').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                    const filename = sanitizedName + extension;
+
+                    // For images, try direct download first (simpler, avoids CORS issues)
+                    if (asset.asset_type === 'image') {
+                        try {
+                            const response = await fetch(asset.src);
+                            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                            
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            
+                            setTimeout(() => {
+                                window.URL.revokeObjectURL(url);
+                                a.remove();
+                            }, 100);
+                        } catch (fetchErr) {
+                            console.warn('Blob fetch failed, trying direct download:', fetchErr);
+                            // Fallback: direct download without blob conversion
+                            const a = document.createElement('a');
+                            a.href = asset.src;
+                            a.download = filename;
+                            a.target = '_blank';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        }
+                    } else {
+                        // For audio files, use blob approach
+                        const response = await fetch(asset.src);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(url);
+                            a.remove();
+                        }, 100);
+                    }
+
                 } catch (err) {
                     console.error('Download failed:', err);
-                    alert('Could not download the file.');
+                    alert('Could not download the file. Please try again.');
                 } finally {
                     downloadButton.disabled = false;
                     downloadButton.style.opacity = '1';
@@ -62,40 +107,56 @@ export class UIRenderer {
                 favButton.style.opacity = '0.5';
                 
                 try {
-                    await this.favoritesManager.toggleFavorite(audio.id);
+                    await this.favoritesManager.toggleFavorite(asset.id);
                 } finally {
                     favButton.disabled = false;
                     favButton.style.opacity = '1';
                 }
             };
 
-            if (this.favoritesManager.isFavorited(audio.id)) {
+            if (this.favoritesManager.isFavorited(asset.id)) {
                 favButton.classList.add('active');
             }
 
             const favCount = document.createElement('div');
             favCount.className = 'favorite-count';
-            favCount.textContent = this.favoritesManager.getFavoriteCount(audio.id);
+            favCount.textContent = this.favoritesManager.getFavoriteCount(asset.id);
             
             favSection.append(favButton, favCount);
 
-            // Play button
-            const playButton = document.createElement('button');
-            playButton.className = 'play-button';
-            playButton.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5v14l11-7z"></path></svg>';
-            playButton.onclick = () => this.audioPlayer.handlePlayClick(audio.src, playButton);
+            card.append(downloadButton, favSection);
 
-            // Audio name
-            const audioName = document.createElement('div');
-            audioName.className = 'audio-name';
-            audioName.textContent = audio.name;
+            if (asset.asset_type === 'audio') {
+                // Play button
+                const playButton = document.createElement('button');
+                playButton.className = 'play-button';
+                playButton.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5v14l11-7z"></path></svg>';
+                playButton.onclick = () => this.audioPlayer.handlePlayClick(asset.src, playButton);
+                card.appendChild(playButton);
+            } else if (asset.asset_type === 'image') {
+                // Image thumbnail instead of play button
+                const imageThumb = document.createElement('img');
+                imageThumb.className = 'asset-thumbnail';
+                imageThumb.src = asset.src;
+                imageThumb.alt = asset.name;
+                card.appendChild(imageThumb);
+            }
 
-            card.append(downloadButton, favSection, playButton, audioName);
+            // Audio name / Asset name
+            const assetName = document.createElement('div');
+            assetName.className = 'audio-name';
+            assetName.textContent = asset.name;
+
+            // Only append asset name for audio assets
+            if (asset.asset_type === 'audio') {
+                card.appendChild(assetName);
+            }
+            
             this.gallery.appendChild(card);
         });
     }
 
-    renderTagFilters(activeTags, onTagClick, onAllClick, onFavoritesClick, onTTSClick, recentTags = [], showingFavorites, showingTTSOnly) {
+    renderTagFilters(activeTags, onTagClick, onAllClick, onFavoritesClick, onTTSClick, onImageClick, recentTags = [], showingFavorites, showingTTSOnly, showingImageOnly) {
         this.tagFilters.innerHTML = '';
 
         // All tags from audio library
@@ -115,7 +176,7 @@ export class UIRenderer {
         // All button
         const allBtn = document.createElement('button');
         allBtn.textContent = 'All';
-        if (activeTags.size === 0 && !showingFavorites && !showingTTSOnly) {
+        if (activeTags.size === 0 && !showingFavorites && !showingTTSOnly && !showingImageOnly) {
             allBtn.classList.add('active');
         }
         allBtn.onclick = onAllClick;
@@ -139,6 +200,16 @@ export class UIRenderer {
         }
         ttsBtn.onclick = onTTSClick;
         this.tagFilters.appendChild(ttsBtn);
+
+        // Image button
+        const imageBtn = document.createElement('button');
+        imageBtn.textContent = 'Images';
+        imageBtn.dataset.filter = 'image';
+        if (showingImageOnly) {
+            imageBtn.classList.add('active');
+        }
+        imageBtn.onclick = onImageClick;
+        this.tagFilters.appendChild(imageBtn);
 
         // Tag buttons
         allTags.forEach(tag => {

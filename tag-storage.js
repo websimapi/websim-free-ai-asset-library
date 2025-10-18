@@ -1,8 +1,10 @@
-const STORAGE_KEY = 'audioFilterUsage';
+const STORAGE_KEY = 'audioFilterUsage_v2';
 
 export function getRecentTags() {
     try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        if (Array.isArray(data)) return data;
+        return [];
     } catch (e) {
         return [];
     }
@@ -21,4 +23,3 @@ export function addRecentTag(tag) {
     recentTags.unshift(tag);
     saveRecentTags(recentTags);
 }
-

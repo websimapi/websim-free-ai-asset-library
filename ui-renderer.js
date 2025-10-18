@@ -65,11 +65,19 @@ export class UIRenderer {
             audioName.textContent = audio.name;
 
             card.append(downloadLink, favSection, playButton, audioName);
+            
+            if (audio.text) {
+                const ttsText = document.createElement('div');
+                ttsText.className = 'tts-text';
+                ttsText.textContent = `"${audio.text}"`;
+                card.appendChild(ttsText);
+            }
+
             this.gallery.appendChild(card);
         });
     }
 
-    renderTagFilters(activeTags, onTagClick, onAllClick, onFavoritesClick, recentTags = []) {
+    renderTagFilters(activeTags, onTagClick, onAllClick, onFavoritesClick, onTTSClick, recentTags = []) {
         this.tagFilters.innerHTML = '';
 
         // All tags from audio library
@@ -100,6 +108,12 @@ export class UIRenderer {
         favBtn.textContent = 'Favorites';
         favBtn.onclick = onFavoritesClick;
         this.tagFilters.appendChild(favBtn);
+
+        // TTS button
+        const ttsBtn = document.createElement('button');
+        ttsBtn.textContent = 'TTS';
+        ttsBtn.onclick = onTTSClick;
+        this.tagFilters.appendChild(ttsBtn);
 
         // Tag buttons
         allTags.forEach(tag => {

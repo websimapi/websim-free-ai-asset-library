@@ -16,8 +16,12 @@
                 <h1>Audio Asset Library</h1>
             </div>
             <button id="request-audio-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 <span>Request Audio</span>
+            </button>
+            <button id="generate-tts-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                <span>Generate TTS</span>
             </button>
         </header>
         <main>
@@ -38,6 +42,36 @@
             <div id="gallery" class="gallery"></div>
             <p id="no-results" class="hidden">No sounds found. Try a different search or filter.</p>
         </main>
+    </div>
+    <div id="tts-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Generate Text-to-Speech</h2>
+                <button id="tts-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="tts-text">Text to generate</label>
+                    <textarea id="tts-text" rows="4" placeholder="Enter text here..."></textarea>
+                    <small id="tts-char-count">0 / 250</small>
+                </div>
+                <div class="form-group">
+                    <label for="tts-voice">Voice</label>
+                    <select id="tts-voice">
+                        <option value="alloy">Alloy</option>
+                        <option value="echo">Echo</option>
+                        <option value="fable">Fable</option>
+                        <option value="onyx">Onyx</option>
+                        <option value="nova">Nova</option>
+                        <option value="shimmer">Shimmer</option>
+                    </select>
+                </div>
+                <button id="tts-generate-btn" class="tts-generate-button">
+                    <span>Generate Audio</span>
+                    <div class="spinner hidden"></div>
+                </button>
+            </div>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js" crossorigin="anonymous"></script>

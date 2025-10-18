@@ -168,7 +168,7 @@ searchInput.addEventListener('input', filterAndRender);
 requestAudioBtn.addEventListener('click', () => {
     // This will open the comments UI with pre-filled text for a suggestion.
     window.websim?.postComment?.({
-        content: 'I would like to request an audio snippet for: \n\n'
+        content: '\n'
     });
 });
 

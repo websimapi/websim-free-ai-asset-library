@@ -56,7 +56,10 @@ const d=[
     {id:55,name:'Invisibility Stealth',src:'invisibility_stealth.mp3',tags:['magic', 'utility', 'stealth', 'fx']},
     {id:56,name:'Haste Buff',src:'haste_buff.mp3',tags:['positive', 'status', 'movement', 'fx']},
     {id:57,name:'Snare Debuff',src:'snare_debuff.mp3',tags:['negative', 'status', 'movement', 'fx']},
-    {id:58,name:'Shield Activate',src:'shield_activate.mp3',tags:['positive', 'status', 'defense', 'fx']}
+    {id:58,name:'Shield Activate',src:'shield_activate.mp3',tags:['positive', 'status', 'defense', 'fx']},
+    {id:59,name:'Aggressive Warp Out',src:'warp_out_aggressive.mp3',tags:['sci-fi', 'teleport', 'fx', 'impact']},
+    {id:60,name:'Ethereal Arrival',src:'ethereal_arrival.mp3',tags:['magic', 'teleport', 'fx', 'short']},
+    {id:61,name:'Teleport Glitch',src:'teleport_glitch.mp3',tags:['sci-fi', 'teleport', 'negative', 'fx']}
 ];
 
 const g=document.getElementById('gallery'),
